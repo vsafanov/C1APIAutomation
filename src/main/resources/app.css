@@ -1,0 +1,7 @@
+.custom-button {
+
+    -fx-font: bold  12px "Arial";
+    -fx-padding: 10;
+    -fx-border-radius: 50px;
+    /*-fx-background-color: #CCFF99;*/
+}
