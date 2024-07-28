@@ -5,3 +5,17 @@
     -fx-border-radius: 50px;
     /*-fx-background-color: #CCFF99;*/
 }
+
+.label {
+    -fx-text-fill: #039ED3;
+    -fx-font-weight: bold;
+}
+
+/*.menu-item .label {*/
+/*    -fx-text-fill: dimgrey; !* Text color *!*/
+/*}*/
+
+.menu-item:focused .label {
+    -fx-text-fill: white; /* Text color */
+}
+

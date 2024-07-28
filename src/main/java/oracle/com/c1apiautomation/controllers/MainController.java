@@ -1,26 +1,29 @@
-package oracle.com.c1apiautomation;
+package oracle.com.c1apiautomation.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.TreeTableColumn.CellDataFeatures;
-import javafx.scene.control.cell.CheckBoxTreeCell;
 
-import javafx.scene.control.cell.TreeItemPropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.stage.Stage;
+import oracle.com.c1apiautomation.MainApplication;
+import oracle.com.c1apiautomation.Utils;
+import oracle.com.c1apiautomation.helpers.CheckBoxTreeTableCell;
+import oracle.com.c1apiautomation.helpers.ContextMenuFactory;
+import oracle.com.c1apiautomation.helpers.ImageTreeTableCell;
+import oracle.com.c1apiautomation.helpers.RequestTypeTreeTableCell;
+import oracle.com.c1apiautomation.model.*;
+import oracle.com.c1apiautomation.model.Module;
 
-import java.awt.event.WindowStateListener;
-import java.io.Console;
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.util.List;
 
-public class HelloController {
-
+public class MainController {
 
     public TreeTableView ttvContainer;
 
@@ -33,16 +36,16 @@ public class HelloController {
     }
 
 
-
     public  void initialize() throws IOException {
 
 
+
         // Load data
-        List<Root> rootData = JsonUtil.readJson("C:\\temp\\C1TestAPIMicroservices.json");
+        List<Root> rootData = Utils.readJson("C:\\temp\\C1TestAPIMicroservices.json");
 
         // Add a column for checkboxes
         TreeTableColumn<Object, Boolean> checkBoxColumn = new TreeTableColumn<>("Run Test");
-        checkBoxColumn.setPrefWidth(80);
+        checkBoxColumn.setPrefWidth(85);
         checkBoxColumn.setCellValueFactory(param -> {
             Object value = param.getValue().getValue();
             return value instanceof SelectableBase?((SelectableBase) value).getSelected():new SimpleBooleanProperty(false);
@@ -56,51 +59,54 @@ public class HelloController {
         });
         checkBoxColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn());
 
-        var microserviceColumn = JsonUtil.createStringColumn("Microservice",Microservice.class, Microservice::getName,120);
+        var microserviceColumn = Utils.createStringColumn("Microservice", Microservice.class, Microservice::getName,100);
+        microserviceColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
 
-        var moduleColumn = JsonUtil.createStringColumn("Module",Module.class, Module::getName, 120); // Adjust accordingly
-
-        var idColumn = JsonUtil.createStringColumn("ID",BaseTestCase.class, BaseTestCase::getId,150);
-        var titleColumn = JsonUtil.createStringColumn("Title", BaseTestCase.class,BaseTestCase::getTitle, 100);
-        var descriptionColumn = JsonUtil.createStringColumn("Description",BaseTestCase.class, BaseTestCase::getDescription,100);
-        var requestTypeColumn = JsonUtil.createStringColumn("Request Type", BaseTestCase.class,BaseTestCase::getRequestType,60);
-        var requestServiceUrl = JsonUtil.createStringColumn("Service Url", BaseTestCase.class,BaseTestCase::getServiceUrl,150);
-        var requestRequestParams = JsonUtil.createStringColumn("Request Params", BaseTestCase.class,BaseTestCase::getRequestParams,150);
-
-        ttvContainer.getColumns().addAll(checkBoxColumn,microserviceColumn,moduleColumn,idColumn,titleColumn,descriptionColumn,requestTypeColumn,requestServiceUrl,requestRequestParams);
-
-        for (var column : ttvContainer.getColumns()) {
-//            ((TreeTableColumn<Object,String>) column).setPrefWidth(150);
-        }
-
-        // Add double-click event handler
-        ttvContainer.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2) {
-                var selectedItem = (TreeItem<Object>) ttvContainer.getSelectionModel().getSelectedItem();
-                if (selectedItem != null && selectedItem.getValue() instanceof BaseTestCase) {
-                    BaseTestCase baseTestCase = (BaseTestCase) selectedItem.getValue();
-                    try {
-                        handleDoubleClick(baseTestCase);
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-        // Create root item
-
-        // Define columns
-//        TreeTableColumn<Object, String> microserviceColumn = new TreeTableColumn<>("Microservice");
-//        microserviceColumn.setCellValueFactory(param -> {
-//            if (param.getValue().getValue() instanceof Microservice) {
-//                return new SimpleStringProperty(((Microservice) param.getValue().getValue()).getName());
-//            } else {
-//                return new SimpleStringProperty("");
-//            }
+        var moduleColumn = Utils.createStringColumn("Module", Module.class, Module::getName, 120); // Adjust accordingly
+        moduleColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+//        moduleColumn.setOnEditCommit(event -> {
+//            TreeItem<Object> currentItem = event.getTreeTablePosition().getTreeItem();
+//            ((Module) currentItem.getValue()).setName(event.getNewValue());
 //        });
 
 
 
+        // Define the image column
+        TreeTableColumn<Object, String> imageColumn = new TreeTableColumn<>("...");
+        imageColumn.setCellValueFactory(param -> new SimpleStringProperty("")); // Dummy value
+        imageColumn.setCellFactory(column -> new ImageTreeTableCell());
+
+        var idColumn = Utils.createStringColumn("Test Case ID", BaseTestCase.class, BaseTestCase::getId,150);
+        var titleColumn = Utils.createStringColumn("Title", BaseTestCase.class,BaseTestCase::getTitle, 100);
+        var descriptionColumn = Utils.createStringColumn("Description",BaseTestCase.class, BaseTestCase::getDescription,100);
+
+        var requestTypeColumn = Utils.createStringColumn("Method", BaseTestCase.class,BaseTestCase::getRequestType,50);
+        requestTypeColumn.setCellFactory(column -> new RequestTypeTreeTableCell());
+
+        var requestServiceUrlColumn = Utils.createStringColumn("Service Url", BaseTestCase.class,BaseTestCase::getServiceUrl,150);
+        var requestRequestParamsColumn = Utils.createStringColumn("Request Params", BaseTestCase.class,BaseTestCase::getRequestParams,150);
+        var expectedResponseCodeColumn = Utils.createStringColumn("Response Code", BaseTestCase.class,BaseTestCase::getExpectedResponseCode,100);
+        var userNameColumn = Utils.createStringColumn("User Name", BaseTestCase.class,BaseTestCase::getUserName,100);
+        var passwordColumn = Utils.createStringColumn("Password", BaseTestCase.class,BaseTestCase::getPassword,100);
+
+        ttvContainer.getColumns().addAll(checkBoxColumn,microserviceColumn,moduleColumn,imageColumn,idColumn,
+                titleColumn,descriptionColumn,requestTypeColumn,requestServiceUrlColumn,
+                requestRequestParamsColumn,expectedResponseCodeColumn,userNameColumn,passwordColumn);
+
+        // Add double-click event handler
+//        ttvContainer.setOnMouseClicked(event -> {
+//            if (event.getClickCount() == 2) {
+//                var selectedItem = (TreeItem<Object>) ttvContainer.getSelectionModel().getSelectedItem();
+//                if (selectedItem != null && selectedItem.getValue() instanceof BaseTestCase) {
+//                    BaseTestCase baseTestCase = (BaseTestCase) selectedItem.getValue();
+//                    try {
+//                        handleDoubleClick(baseTestCase, selectedItem);
+//                    } catch (IOException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }
+//            }
+//        });
 
 
         // Populate TreeTableView with data
@@ -133,14 +139,17 @@ public class HelloController {
         }
 
 
-        ttvContainer.setRoot(rootItem);
+//        ttvContainer.setRoot(rootItem);
+        ttvContainer.setEditable(true);
 
+        //add context menu
+        ttvContainer.setContextMenu(ContextMenuFactory.CreateContextMenu(ttvContainer));
 //        ttvContainer.getColumns().add(microserviceColumn);
 
         ttvContainer.setShowRoot(false);
 //        ttvContainer.setShowRoot(true);
-    }
 
+    }
 
     private void addCheckBoxListener(SelectableBase parent, TreeItem<Object> parentItem) {
         try {
@@ -178,9 +187,27 @@ public class HelloController {
 //            e.printStackTrace();
 //        }
 //    }
-
-    private void handleDoubleClick(BaseTestCase baseTestCase) throws JsonProcessingException {
+//    @FXML
+    private void handleDoubleClick(BaseTestCase baseTestCase, TreeItem<Object> selectedItem) throws IOException {
         // Handle the double-click event on a BaseTestCase item
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("form-view.fxml"));
+
+        Parent parent = fxmlLoader.load();
+
+        Stage stage = new Stage();
+        Scene scene = new Scene(parent);
+
+        stage.setTitle("Edit Form");
+        scene.getStylesheets().add("/app.css");
+        stage.setScene(scene);
+
+        // Get the controller and set the BaseTestCase data
+        FormController controller = fxmlLoader.getController();
+        controller.setBaseTestCase(baseTestCase,ttvContainer,selectedItem, stage);
+        stage.show();
+
+
+//ttvContainer.refresh();
         ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(baseTestCase);
 

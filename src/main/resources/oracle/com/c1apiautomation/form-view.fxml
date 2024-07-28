@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane prefHeight="628.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="oracle.com.c1apiautomation.controllers.FormController">
+    <Button fx:id="btnSave" layoutX="1036.0" layoutY="587.0" mnemonicParsing="false" onAction="#onSaveData" text="Save" />
+   <GridPane layoutX="14.0" layoutY="32.0" prefHeight="529.0" prefWidth="407.0">
+     <columnConstraints>
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="181.0" minWidth="10.0" prefWidth="133.0" />
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="259.0" />
+     </columnConstraints>
+     <rowConstraints>
+       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="26.0" minHeight="10.0" prefHeight="19.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="29.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="59.0" minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="54.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="16.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="55.0" minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="43.0" minHeight="10.0" prefHeight="13.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="104.0" minHeight="10.0" prefHeight="104.0" vgrow="SOMETIMES" />
+     </rowConstraints>
+      <children>
+         <CheckBox fx:id="chkSelected" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Run Test" styleClass="label" GridPane.rowIndex="12" />
+         <Label text="Test Case Id" styleClass="label" />
+         <TextField fx:id="txtId" prefHeight="25.0" prefWidth="161.0" GridPane.columnIndex="1" />
+         <Label text="Title" GridPane.rowIndex="1" />
+          <TextField fx:id="txtTitle" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <Label text="Request Type" textFill="#0e95bf" GridPane.rowIndex="3" />
+         <Label text="Description" textFill="#0e95bf" GridPane.rowIndex="2" />
+         <TextField fx:id="txtDescription" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         <Label text="Service Url" textFill="#0e95bf" GridPane.rowIndex="4" />
+         <TextField fx:id="txtServiceUrl" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         <TextField fx:id="txtHeader" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+         <TextField fx:id="txtPassword" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+         <Label text="Header" textFill="#0e95bf" GridPane.rowIndex="5" />
+         <Label text="Expected Response Code" textFill="#0e95bf" GridPane.rowIndex="6" />
+         <Label text="Password" textFill="#0e95bf" GridPane.rowIndex="10" />
+         <ComboBox fx:id="cmbRequestType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         <CheckBox fx:id="chkSkipValidation" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Skip Validation" styleClass="label" GridPane.rowIndex="13" />
+         <ComboBox fx:id="cmdResponseCode" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+         <CheckBox fx:id="chkUseAuth" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" text="Use Authentication" styleClass="label" GridPane.rowIndex="8" />
+         <Label text="User Name" textFill="#0e95bf" GridPane.rowIndex="9" />
+         <TextField fx:id="txtUserName" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+         <Label text="PreReq Sql" textFill="#0e95bf" GridPane.rowIndex="15" />
+         <TextArea prefHeight="54.0" prefWidth="266.0" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+      </children>
+   </GridPane>
+   <GridPane layoutX="471.0" layoutY="9.0" prefHeight="553.0" prefWidth="606.0" AnchorPane.topAnchor="9.0">
+     <columnConstraints>
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="310.0" minWidth="10.0" prefWidth="305.0" />
+       <ColumnConstraints hgrow="SOMETIMES" maxWidth="465.0" minWidth="10.0" prefWidth="301.0" />
+     </columnConstraints>
+     <rowConstraints>
+       <RowConstraints maxHeight="68.0" minHeight="0.0" prefHeight="19.0" vgrow="SOMETIMES" />
+       <RowConstraints maxHeight="182.0" minHeight="10.0" prefHeight="179.0" vgrow="SOMETIMES" />
+       <RowConstraints maxHeight="54.0" minHeight="8.0" prefHeight="23.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="191.0" minHeight="10.0" prefHeight="181.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
+         <RowConstraints maxHeight="123.0" minHeight="10.0" prefHeight="111.0" vgrow="SOMETIMES" />
+     </rowConstraints>
+      <children>
+         <TextArea prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.rowIndex="1" />
+         <TextArea prefHeight="75.0" prefWidth="421.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <GridPane.margin>
+               <Insets left="5.0" />
+            </GridPane.margin>
+         </TextArea>
+         <Label text="Payload" textFill="#0e95bf">
+            <padding>
+               <Insets left="10.0" />
+            </padding>
+         </Label>
+         <Label text="Expected Response" textFill="#0e95bf" wrapText="true" GridPane.columnIndex="1">
+            <padding>
+               <Insets left="10.0" />
+            </padding>
+         </Label>
+         <Label text="Input" textFill="#0e95bf" GridPane.rowIndex="2">
+            <padding>
+               <Insets left="10.0" />
+            </padding>
+         </Label>
+         <TextArea prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.rowIndex="3" />
+         <TextArea prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <GridPane.margin>
+               <Insets left="5.0" />
+            </GridPane.margin>
+         </TextArea>
+         <TextArea prefHeight="200.0" prefWidth="200.0" wrapText="true" GridPane.rowIndex="5" />
+         <Label text="DB Query" textFill="#0e95bf" GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <padding>
+               <Insets left="10.0" />
+            </padding>
+         </Label>
+         <Label text="Expected DB Result" textFill="#0e95bf" wrapText="true" GridPane.rowIndex="4">
+            <padding>
+               <Insets left="10.0" />
+            </padding>
+         </Label>
+         <Label text="Tear Down Sql" textFill="#0e95bf" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4">
+            <padding>
+               <Insets left="10.0" />
+            </padding>
+         </Label>
+         <TextArea prefHeight="115.0" prefWidth="296.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="5">
+            <GridPane.margin>
+               <Insets left="5.0" />
+            </GridPane.margin>
+         </TextArea>
+      </children>
+   </GridPane>
+   <Button fx:id="btnSaveAsNew" layoutX="937.0" layoutY="587.0" mnemonicParsing="false" onAction="#onSaveData" text="Save As New" />
+</AnchorPane>

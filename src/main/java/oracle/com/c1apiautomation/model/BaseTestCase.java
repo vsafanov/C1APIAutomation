@@ -1,8 +1,5 @@
-package oracle.com.c1apiautomation;
+package oracle.com.c1apiautomation.model;
 
-
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 
 public abstract class BaseTestCase extends SelectableBase {
 //    private final BooleanProperty selected  = new SimpleBooleanProperty();

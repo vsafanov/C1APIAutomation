@@ -1,9 +1,10 @@
-package oracle.com.c1apiautomation;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.Property;
+package oracle.com.c1apiautomation.helpers;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.*;
 import javafx.util.Callback;
+import oracle.com.c1apiautomation.model.BaseTestCase;
+import oracle.com.c1apiautomation.model.Microservice;
+import oracle.com.c1apiautomation.model.Module;
 
 public class CheckBoxTreeTableCell<S> extends TreeTableCell<S, Boolean> {
 

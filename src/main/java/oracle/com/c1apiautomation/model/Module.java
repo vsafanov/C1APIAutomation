@@ -1,6 +1,4 @@
-package oracle.com.c1apiautomation;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+package oracle.com.c1apiautomation.model;
 
 import java.util.List;
 

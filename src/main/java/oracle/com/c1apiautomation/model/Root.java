@@ -1,7 +1,5 @@
 
-package oracle.com.c1apiautomation;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package oracle.com.c1apiautomation.model;
 
 public class Root {
     private Microservice microservice;
