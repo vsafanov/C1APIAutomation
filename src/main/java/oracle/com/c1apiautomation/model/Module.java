@@ -33,15 +33,4 @@ public class Module extends  SelectableBase{
         this.testCases = testCases;
     }
 
-//    public boolean isSelected() {
-//        return selected.get();
-//    }
-//
-//    public BooleanProperty getSelected() {
-//        return selected;
-//    }
-//
-//    public void setSelected(Boolean selected) {
-//        this.selected.set(selected);
-//    }
 }

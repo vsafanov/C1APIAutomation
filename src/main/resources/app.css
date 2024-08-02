@@ -7,13 +7,14 @@
 }
 
 .label {
-    -fx-text-fill: #039ED3;
+    /*-fx-text-fill: #039ED3;*/
     -fx-font-weight: bold;
 }
 
-/*.menu-item .label {*/
-/*    -fx-text-fill: dimgrey; !* Text color *!*/
-/*}*/
+.menu-item .label {
+    /*-fx-text-fill: dimgrey; !* Text color *!*/
+    -fx-font-weight: normal;
+}
 
 .menu-item:focused .label {
     -fx-text-fill: white; /* Text color */

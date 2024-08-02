@@ -21,12 +21,12 @@ public class RequestTypeTreeTableCell extends TreeTableCell<Object, String> {
             TreeItem<Object> treeItem = getTreeTableView().getTreeItem(getIndex());
             if (treeItem != null && treeItem.getValue() instanceof BaseTestCase) {
                 BaseTestCase obj = (BaseTestCase) treeItem.getValue();
-                String style = switch (obj.getRequestType()) {
-                    case "POST" -> "-fx-text-fill: gold;";
+                String style = switch (obj.getRequestType().toUpperCase()) {
+                    case "POST" -> "-fx-text-fill: magenta;";
                     case "GET" -> "-fx-text-fill: green;";
-                    case "PUT" -> "-fx-text-fill: blue;";
+                    case "PUT" -> "-fx-text-fill: orange;";
                     case "PATCH" -> "-fx-text-fill: purple;";
-                    case "DELETE" -> "-fx-text-fill: orange;";
+                    case "DELETE" -> "-fx-text-fill: crimson;";
                     default -> "";
                 };
                 setStyle(style + "-fx-font-weight: bold;");
