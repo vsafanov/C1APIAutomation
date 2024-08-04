@@ -2,11 +2,12 @@ package oracle.com.c1apiautomation.model;
 
 import java.util.List;
 
-public class Module extends  SelectableBase{
+public class Module extends SelectableBase implements Cloneable {
 //    private BooleanProperty selected  = new SimpleBooleanProperty();
     private String name;
     private List<PreReq> preReqs;
     private List<TestCase> testCases;
+
 
     // Getters and Setters
     public String getName() {
@@ -33,4 +34,14 @@ public class Module extends  SelectableBase{
         this.testCases = testCases;
     }
 
+    @Override
+    public Module clone() {
+        try {
+            Module clone = (Module) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }

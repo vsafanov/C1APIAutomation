@@ -3,7 +3,6 @@ package oracle.com.c1apiautomation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
@@ -12,9 +11,7 @@ import javafx.scene.text.Font;
 import javafx.util.Callback;
 import oracle.com.c1apiautomation.model.Root;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import java.io.*;
 import java.util.Map;
 
 public class Utils {
@@ -54,7 +51,7 @@ public class Utils {
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty || item == null) {
+                if (empty || item == null || item.isEmpty()) {
                     setText(null);
                     setTooltip(null);
                 } else {

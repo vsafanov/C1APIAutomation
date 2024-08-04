@@ -9,8 +9,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 
+import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import oracle.com.c1apiautomation.MainApplication;
@@ -24,9 +24,6 @@ import oracle.com.c1apiautomation.model.Module;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-import static org.controlsfx.tools.Utils.getWindow;
 
 public class MainController {
 
@@ -36,14 +33,13 @@ public class MainController {
 
 
     public void initialize() throws IOException {
+        handleLoadFromJson();
+    }
+
+    public void LoadTreeTableView(String filePath) throws IOException {
 
         // Load data
-        Root rootData = Utils.readJson("C:\\Users\\VSAFANOV\\Documents\\My Super Deals Private Folder\\Sandbox\\JavaFX\\C1TestAPIMicroservices.json");
-//        Root rootData = Utils.readJson("C:\\temp\\C1TestAPIMicroservices.json");
-
-//       v1.setOnAction(e->handleLoadFromJson());
-
-
+        Root rootData = Utils.readJson(filePath);
 
         // Add a column for checkboxes
         TreeTableColumn<Object, Boolean> checkBoxColumn = new TreeTableColumn<>("Run Test");
@@ -52,26 +48,17 @@ public class MainController {
         checkBoxColumn.setCellValueFactory(param -> {
             Object value = param.getValue().getValue();
             return value instanceof SelectableBase ? ((SelectableBase) value).getSelected() : new SimpleBooleanProperty(false);
-
-//            return switch (value) {
-//                case Microservice microservice -> microservice.getSelected();
-//                case Module module -> module.getSelected();
-//                case BaseTestCase baseTestCase -> baseTestCase.getSelected();
-//                case null, default -> new SimpleBooleanProperty(false);
-//            };
         });
         checkBoxColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn());
 
         var microserviceColumn = Utils.createStringColumn("Microservice", Microservice.class, Microservice::getName, 100);
         microserviceColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
+        microserviceColumn.setOnEditCommit(this::CommitEdit);
 
         var moduleColumn = Utils.createStringColumn("Module", Module.class, Module::getName, 120); // Adjust accordingly
         moduleColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
-//        moduleColumn.setOnEditCommit(event -> {
-//            TreeItem<Object> currentItem = event.getTreeTablePosition().getTreeItem();
-//            ((Module) currentItem.getValue()).setName(event.getNewValue());
-//        });
-
+        // Handle updating the Module object when the cell is edited
+        moduleColumn.setOnEditCommit(this::CommitEdit);
 
         // Define the image column
         TreeTableColumn<Object, String> imageColumn = new TreeTableColumn<>("...");
@@ -115,15 +102,12 @@ public class MainController {
 //            }
 //        });
 
-
         // Populate TreeTableView with data
         TreeItem<Object> rootItem = new TreeItem<>(rootData);
         ttvContainer.setRoot(rootItem);
 
-//        var microservices = rootData.getMicroservices();
         // Populate tree items
         for (Microservice microservice : rootData.getMicroservices()) {
-//            Microservice microservice = item.getMicroservice();
             TreeItem<Object> microserviceItem = new TreeItem<>(microservice);
             // Add listener to update child nodes when parent node is checked/unchecked
             addCheckBoxListener(microservice, microserviceItem);
@@ -155,21 +139,32 @@ public class MainController {
 
         ttvContainer.setTableMenuButtonVisible(true);
 
-//        ttvContainer.getColumns().add(microserviceColumn);
-
         ttvContainer.setShowRoot(false);
 //        ttvContainer.setShowRoot(true);
 
     }
 
+    private void CommitEdit(CellEditEvent<Object,String> event)
+    {
+        TreeItem<Object> treeItem = event.getRowValue();
+        if (treeItem.getValue() instanceof Module module) {
+            module.setName(event.getNewValue());  // Update the Module's name property
+        }
+        if (treeItem.getValue() instanceof Microservice microservice) {
+            microservice.setName(event.getNewValue());  // Update the Module's name property
+        }
+    }
+
     @FXML
-    private void handleLoadFromJson() {
+    private void handleLoadFromJson() throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
+        fileChooser.setTitle("Select Jason API Test Project");
+        fileChooser.setInitialDirectory(new File("C:\\Users\\VSAFANOV\\Documents\\My Super Deals Private Folder\\Sandbox\\JavaFX"));
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
-//            loadJsonFileIntoTreeTableView(file);
+            LoadTreeTableView(file.getPath());
         }
     }
 
