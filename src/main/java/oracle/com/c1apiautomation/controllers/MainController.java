@@ -3,6 +3,7 @@ package oracle.com.c1apiautomation.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.beans.property.*;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -11,6 +12,7 @@ import javafx.scene.control.*;
 
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import oracle.com.c1apiautomation.MainApplication;
@@ -29,7 +31,8 @@ public class MainController {
 
     public TreeTableView ttvContainer;
     public MenuBar menuBar;
-    public MenuItem v1;
+    public MenuItem miLoadJson;
+    public VBox root;
 
 
     public void initialize() throws IOException {
@@ -69,7 +72,7 @@ public class MainController {
         var titleColumn = Utils.createStringColumn("Title", BaseTestCase.class, BaseTestCase::getTitle, 100);
         var descriptionColumn = Utils.createStringColumn("Description", BaseTestCase.class, BaseTestCase::getDescription, 100);
 
-        var requestTypeColumn = Utils.createStringColumn("Method", BaseTestCase.class, BaseTestCase::getRequestType, 50);
+        var requestTypeColumn = Utils.createStringColumn("Method", BaseTestCase.class, BaseTestCase::getRequestType, 60);
         requestTypeColumn.setCellFactory(column -> new RequestTypeTreeTableCell());
 
         var requestServiceUrlColumn = Utils.createStringColumn("Service Url", BaseTestCase.class, BaseTestCase::getServiceUrl, 150);
@@ -144,8 +147,7 @@ public class MainController {
 
     }
 
-    private void CommitEdit(CellEditEvent<Object,String> event)
-    {
+    private void CommitEdit(CellEditEvent<Object, String> event) {
         TreeItem<Object> treeItem = event.getRowValue();
         if (treeItem.getValue() instanceof Module module) {
             module.setName(event.getNewValue());  // Update the Module's name property
@@ -220,7 +222,7 @@ public class MainController {
 
         // Get the controller and set the BaseTestCase data
         FormController controller = fxmlLoader.getController();
-        controller.setBaseTestCase(baseTestCase, ttvContainer, selectedItem, stage);
+//        controller.setBaseTestCase(baseTestCase, ttvContainer, selectedItem, stage);
         stage.show();
 
 
@@ -231,6 +233,22 @@ public class MainController {
         System.out.println("Double-clicked on: " + baseTestCase.getSelected());
         System.out.println(json);
     }
+
+    public void handleLoadTheme(ActionEvent actionEvent) {
+        var theme = ((MenuItem) actionEvent.getTarget()).getId();
+        var dark = "/DarkTheme.css";
+        switch (theme) {
+            case "miDark":
+                root.getScene().getStylesheets().add(dark);
+                break;
+            case "miLight":
+                root.getScene().getStylesheets().removeIf(s->s.equals(dark));
+//                root.getScene().getStylesheets().clear(); //add("/LightTheme.css");
+//                root.getScene().getStylesheets().add(getClass().getResource("/LightTheme.css").toExternalForm());
+                break;
+        }
+    }
+
 
 //    private void addCheckBoxListener(Module parent, TreeItem<Object> parentItem) {
 //        parent.getSelected().addListener((obs, oldVal, newVal) -> {

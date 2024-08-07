@@ -1,15 +1,11 @@
 package oracle.com.c1apiautomation.helpers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import oracle.com.c1apiautomation.MainApplication;
+import oracle.com.c1apiautomation.controllers.EditMode;
 import oracle.com.c1apiautomation.controllers.FormController;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
@@ -43,83 +39,111 @@ public class ContextMenuFactory {
 
                         switch (selectedItem.getValue()) {
                             case Microservice microservice -> {
-                                createMenuItem("Add New Microservice", null, "addItem.png");
+                                createMenuItem("Add New Microservice", e -> EditRecord(e, EditMode.ADD_MICROSERVICE), "addItem.png");
                                 createMenuItem("Delete Microservice", e -> DeleteRecord(), "deleteItem.png");
-                                createMenuItem("Add New Module", null, "addItem.png");
+                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "addItem.png");
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && (clipboardContent instanceof Microservice || clipboardContent instanceof Module)) {
-                                    createMenuItem("Paste", e -> {
-                                        try {
-                                            PasteRecord();
-                                        } catch (JsonProcessingException ex) {
-                                            throw new RuntimeException(ex);
-                                        }
-                                    }, "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
                                 }
                             }
                             case Module module -> {
-                                createMenuItem("Add New Module", null, "addItem.png");
+                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "addItem.png");
                                 createMenuItem("Delete Module", e -> DeleteRecord(), "deleteItem.png");
-                                createMenuItem("Add New Test", e -> EditRecord(), "addItem.png");
+                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "addItem.png");
+                                createMenuItem("Add New Test", e -> EditRecord(e, EditMode.ADD_TESTCASE), "addItem.png");
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && (clipboardContent instanceof BaseTestCase || clipboardContent instanceof Module)) {
-                                    createMenuItem("Paste", e -> {
-                                        try {
-                                            PasteRecord();
-                                        } catch (JsonProcessingException ex) {
-                                            throw new RuntimeException(ex);
-                                        }
-                                    }, "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
                                 }
 
                             }
                             case PreReq preReq -> {
-                                createMenuItem("Add New PreReq", e -> EditRecord(), "addItem.png");
-                                createMenuItem("Edit PreReq", e -> EditRecord(), "editItem.png");
+                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "addItem.png");
+                                createMenuItem("Edit PreReq", e -> EditRecord(e, EditMode.EDIT_PREREQ), "editItem.png");
                                 createMenuItem("Delete PreReq", e -> DeleteRecord(), "deleteItem.png");
 
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && clipboardContent instanceof PreReq) {
-                                    createMenuItem("Paste", e -> {
-                                        try {
-                                            PasteRecord();
-                                        } catch (JsonProcessingException ex) {
-                                            throw new RuntimeException(ex);
-                                        }
-                                    }, "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
                                 }
 
                             }
 
                             case TestCase testCase -> {
-                                createMenuItem("Add New Test Case", e -> EditRecord(), "addItem.png");
-                                createMenuItem("Edit Test Case", e -> EditRecord(), "editItem.png");
+                                createMenuItem("Add New Test Case", e -> EditRecord(e, EditMode.ADD_TESTCASE), "addItem.png");
+                                createMenuItem("Edit Test Case", e -> EditRecord(e, EditMode.EDIT_TESTCASE), "editItem.png");
                                 createMenuItem("Delete Test Case", e -> DeleteRecord(), "deleteItem.png");
 
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && clipboardContent instanceof TestCase) {
-                                    createMenuItem("Paste", e -> {
-                                        try {
-                                            PasteRecord();
-                                        } catch (JsonProcessingException ex) {
-                                            throw new RuntimeException(ex);
-                                        }
-                                    }, "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
                                 }
-
                             }
-//                            case  TestCase microservice-> contextMenu.getItems().add( new MenuItem("Add TestCase"));
                             case null, default -> contextMenu.getItems().add(new MenuItem("Non Existing Type"));
                         }
                         System.out.println(selectedItem.getValue());
                     }
-
                     createInitContextMenu();
-//                    contextMenu.show(treeTableView, event.getScreenX(), event.getScreenY());
                 }
         );
         //init menu for first load, otherwise it's somehow not showing first time
         createInitContextMenu();
+    }
+
+    private void AddMicroservice(ActionEvent event, EditMode editMode) {
+
+        var mi = ((MenuItem) event.getTarget()).getParentPopup();
+        Scene scene = mi.getScene();
+
+        var formController = new FormController(scene);
+        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
+        try {
+            formController.addMicroservice(selectedItem);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void AddModule(ActionEvent event, EditMode editMode) {
+
+        var mi = ((MenuItem) event.getTarget()).getParentPopup();
+        Scene scene = mi.getScene();
+
+        var formController = new FormController(scene);
+        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
+        try {
+            formController.addModule(selectedItem);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void EditRecord(ActionEvent event, EditMode editMode) {
+        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
+        var mi = ((MenuItem) event.getTarget()).getParentPopup();
+        Scene scene = mi.getScene();
+        var formController = new FormController(scene);
+        try {
+            switch (editMode) {
+                case ADD_MICROSERVICE -> {
+                    formController.addMicroservice(selectedItem);
+                }
+                case ADD_MODULE -> {
+                    formController.addModule(selectedItem);
+                }
+                case ADD_PREREQ, ADD_TESTCASE, EDIT_PREREQ, EDIT_TESTCASE -> {
+                    BaseTestCase baseTestCase = null;
+                    if (selectedItem != null && selectedItem.getValue() instanceof BaseTestCase ) {
+                        baseTestCase = (BaseTestCase) selectedItem.getValue();
+                    }
+                    formController.EditBaseTest(baseTestCase, treeTableView, selectedItem, editMode);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
@@ -129,10 +153,27 @@ public class ContextMenuFactory {
 
             var selectedObject = selectedItem.getValue();
             Object clonedObject;
-            switch (selectedObject)
-            {
-                case Microservice microservice -> {var temp = microservice.clone(); temp.setName(temp.getName() + " New"); clonedObject = temp; }
-                case Module module -> {var temp = module.clone(); temp.setName(temp.getName() + " New"); clonedObject = temp;}
+            switch (selectedObject) {
+                case Microservice microservice -> {
+                    var temp = microservice.clone();
+                    temp.setName(temp.getName() + " New");
+                    clonedObject = temp;
+                }
+                case Module module -> {
+                    var temp = module.clone();
+                    temp.setName(temp.getName() + " New");
+                    clonedObject = temp;
+                }
+                case TestCase testCase -> {
+                    var temp = testCase.clone();
+                    temp.setId(temp.getId() + " New");
+                    clonedObject = temp;
+                }
+                case PreReq preReq -> {
+                    var temp = preReq.clone();
+                    temp.setId(temp.getId() + " New");
+                    clonedObject = temp;
+                }
                 default -> clonedObject = selectedObject;
             }
 
@@ -145,14 +186,14 @@ public class ContextMenuFactory {
         }
     }
 
-    private void PasteRecord() throws JsonProcessingException {
+    private void PasteRecord() {
         var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
         if (selectedItem != null && (selectedItem.getValue() instanceof SelectableBase)) {
 
             if (clipboardContent instanceof Microservice) {
 
                 if (selectedItem.getValue() instanceof Root) {
-                    ((Root) selectedItem.getValue()).getMicroservices().add( (Microservice) clipboardContent);
+                    ((Root) selectedItem.getValue()).getMicroservices().add((Microservice) clipboardContent);
                     selectedItem.getChildren().addLast(clipboardTreeItem);
                 } else { //it's root
                     ((Root) selectedItem.getParent().getValue()).getMicroservices().add((Microservice) clipboardContent);
@@ -236,7 +277,6 @@ public class ContextMenuFactory {
         }
     }
 
-
     private void createInitContextMenu() {
         createMenuItem("Expand All", e -> expandTreeView(treeTableView.getRoot(), true), "expand.png");
         createMenuItem("Collapse All", e -> expandTreeView(treeTableView.getRoot(), false), "collapse.png");
@@ -267,32 +307,6 @@ public class ContextMenuFactory {
         }
     }
 
-    private void EditRecord() {
-        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
-        if (selectedItem != null && selectedItem.getValue() instanceof BaseTestCase) {
-            BaseTestCase baseTestCase = (BaseTestCase) selectedItem.getValue();
-            try {
-                FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("form-view.fxml"));
-
-                Parent parent = fxmlLoader.load();
-
-                Stage stage = new Stage();
-                Scene scene = new Scene(parent);
-                stage.setTitle("Edit Form");
-
-                scene.getStylesheets().add("/app.css");
-                stage.setScene(scene);
-
-                // Get the controller and set the BaseTestCase data
-                FormController controller = fxmlLoader.getController();
-                controller.setBaseTestCase(baseTestCase, treeTableView, selectedItem, stage);
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.show();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     private void DeleteRecord() {
         // create an alert

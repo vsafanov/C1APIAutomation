@@ -18,6 +18,7 @@ public class MainApplication extends Application {
         //Engine to run tests, possible names: API Test Runner, API Test Engine, API Test Processor
         stage.titleProperty();
         scene.getStylesheets().add("/app.css");
+        scene.getStylesheets().add("/DarkTheme.css");
 //        scene.getStylesheets().add("path/stylesheet.css");
 
         stage.setScene(scene);

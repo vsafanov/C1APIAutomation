@@ -1,8 +1,9 @@
 package oracle.com.c1apiautomation.model;
 
+import java.io.Closeable;
 import java.util.List;
 
-public class Microservice extends  SelectableBase implements Cloneable{
+public class Microservice extends  SelectableBase {
 
     private String name;
     private List<Module> modules;
@@ -26,12 +27,7 @@ public class Microservice extends  SelectableBase implements Cloneable{
 
     @Override
     public Microservice clone() {
-        try {
-            Microservice clone = (Microservice) super.clone();
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
+        // TODO: copy mutable state here, so the clone can't change the internals of the original
+        return (Microservice) super.clone();
     }
 }

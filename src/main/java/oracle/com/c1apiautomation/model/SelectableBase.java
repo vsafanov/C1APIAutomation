@@ -6,7 +6,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.image.Image;
 
-public abstract class SelectableBase {
+import java.io.Closeable;
+
+public abstract class SelectableBase implements Cloneable {
 
     private final BooleanProperty selected = new SimpleBooleanProperty();
 
@@ -22,6 +24,14 @@ public abstract class SelectableBase {
         this.selected.set(selected);
     }
 
-
+    @Override
+    public SelectableBase clone() {
+        try {
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return (SelectableBase) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
 }
 

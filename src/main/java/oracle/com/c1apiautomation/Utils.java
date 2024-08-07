@@ -59,7 +59,7 @@ public class Utils {
                     Tooltip tooltip = new Tooltip(item);
                     tooltip.setMaxWidth(250);
                     tooltip.setWrapText(true);
-                    tooltip.setFont(Font.font(tooltip.getFont().getFamily(), 12));
+//                    tooltip.setFont(Font.font(tooltip.getFont().getFamily(), 12));
 //                    tooltip.setTextOverrun(OverrunStyle.CLIP);
                     setTooltip(tooltip);
                 }

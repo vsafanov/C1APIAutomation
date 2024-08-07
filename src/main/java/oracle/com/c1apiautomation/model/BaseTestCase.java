@@ -184,6 +184,12 @@ public abstract class BaseTestCase extends SelectableBase {
         this.preReqSql = preReqSql;
     }
 
+    @Override
+    public BaseTestCase clone() {
+        // TODO: copy mutable state here, so the clone can't change the internals of the original
+        return (BaseTestCase) super.clone();
+    }
+
 //    public boolean isSelected() {
 //        return selected.get();
 //    }
