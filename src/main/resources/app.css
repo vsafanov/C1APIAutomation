@@ -1,9 +1,12 @@
 .custom-button {
-
-    -fx-font: bold  12px "Arial";
-    -fx-padding: 10;
-    -fx-border-radius: 50px;
-    /*-fx-background-color: #CCFF99;*/
+    /*-fx-font: bold  12px "Arial";*/
+    -fx-padding: 5;
+    -fx-border-radius: 5px;
+    /*-fx-background-radius: 5;*/
+    /*-fx-background-color: blue;*/
+    /*-fx-text-fill: white;*/
+    -fx-background-insets: 1;
+    -fx-background-radius: 5;
 }
 
 .root{
@@ -44,4 +47,42 @@
     padding: 10;
     -fx-font-size: 13;
     /*-fx-background-color: azure;*/
+}
+
+.highlight{
+    -fx-fill: green;
+}
+
+.default {
+    -fx-fill: black; /* or whatever default color you want */
+}
+
+.grid-pane-border {
+    -fx-border-color: #AFB1B3;
+    -fx-padding: 8;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+
+
+.label-env-default{
+    -fx-font-weight: bold !important;
+    -fx-font-size: 13.0 !important;
+}
+
+.label-env-inactive{
+    -fx-text-fill: orange !important;
+}
+
+.label-env-active{
+    -fx-text-fill: green !important;
+}
+
+.table-view .column-header .label {
+    /*-fx-text-fill: #3E3E40;*/
+    -fx-font-size: 12;
+    -fx-alignment: center;
+    -fx-cursor: HAND;
+    cursor: HAND;
 }

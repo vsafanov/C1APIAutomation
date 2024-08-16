@@ -1,3 +1,4 @@
+
 package oracle.com.c1apiautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;

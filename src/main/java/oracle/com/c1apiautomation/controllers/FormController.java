@@ -35,9 +35,10 @@ public class FormController {
     public ComboBox<String> cmbRequestType;
     public CheckBox chkSkipValidation;
     public ComboBox<String> cmdResponseCode;
-    public CheckBox chkUseAuth;
+//    public CheckBox chkUseAuth;
+    public ComboBox<String> cmbAuthType;
     public TextField txtUserName;
-    public Button btnSaveAsNew;
+//    public Button btnSaveAsNew;
     public DialogPane dlgEditBaseTest;
     public DialogPane dlgAddMs;
     public TextArea taPreReqSql;
@@ -53,12 +54,13 @@ public class FormController {
     public TextField txtModule;
 
 
-    private BaseTestCase testCase;
-    private TreeTableView<Object> treeTableView;
-    private Stage stage;
-    private TreeItem<Object> selectedItem;
 
-    private EditMode editMode;
+//    private BaseTestCase testCase;
+//    private TreeTableView<Object> treeTableView;
+//    private Stage stage;
+//    private TreeItem<Object> selectedItem;
+
+//    private EditMode editMode;
     private Scene scene;
 
     public FormController(Scene scene) {
@@ -89,7 +91,7 @@ public class FormController {
             txtServiceUrl.setText(model.getServiceUrl());
             txtHeader.setText(model.getHeader());
             cmdResponseCode.setValue(model.getExpectedResponseCode());
-            chkUseAuth.setSelected(model.isUseAuthentication());
+            cmbAuthType.setValue(model.isUseAuthentication());
             txtUserName.setText(model.getUserName());
             txtPassword.setText(model.getPassword());
             chkSelected.setSelected(model.isSelected());
@@ -120,7 +122,7 @@ public class FormController {
         model.setServiceUrl(txtServiceUrl.getText());
         model.setHeader(txtHeader.getText());
         model.setExpectedResponseCode(cmdResponseCode.getValue());
-        model.setUseAuthentication(chkUseAuth.isSelected());
+        model.setUseAuthentication(cmbAuthType.getValue());
         model.setUserName(txtUserName.getText());
         model.setPassword(txtPassword.getText());
         model.setSelected(chkSelected.isSelected());
@@ -268,30 +270,30 @@ public class FormController {
     }
 
 
-    public void onSaveData(ActionEvent actionEvent) {
-        testCase.setTitle(txtTitle.getText());
-        treeTableView.refresh();
-        System.out.println(testCase.getTitle());
-        System.out.println(testCase instanceof PreReq);
-        stage.close();
-    }
+//    public void onSaveData(ActionEvent actionEvent) {
+//        testCase.setTitle(txtTitle.getText());
+//        treeTableView.refresh();
+//        System.out.println(testCase.getTitle());
+//        System.out.println(testCase instanceof PreReq);
+//        stage.close();
+//    }
 
-    public void addItemToModule(TreeItem<Object> baseTestCaseItem, BaseTestCase baseTestCase) {
-
-        if (selectedItem.getParent() != null) {
-            var currentModule = (Module) selectedItem.getParent().getValue();
-            if (baseTestCase instanceof PreReq) {
-                currentModule.getPreReqs().add((PreReq) baseTestCase);
-            }
-            if (baseTestCase instanceof TestCase) {
-                currentModule.getTestCases().add((TestCase) baseTestCase);
-            }
-            TreeItem<Object> newItem = new TreeItem<>(baseTestCase);
-            selectedItem.getParent().getChildren().add(newItem);
-            System.out.println(currentModule);
-
-            // Optionally expand the module item to show the new PreReq
-            selectedItem.getParent().setExpanded(true);
-        }
-    }
+//    public void addItemToModule(TreeItem<Object> baseTestCaseItem, BaseTestCase baseTestCase) {
+//
+//        if (selectedItem.getParent() != null) {
+//            var currentModule = (Module) selectedItem.getParent().getValue();
+//            if (baseTestCase instanceof PreReq) {
+//                currentModule.getPreReqs().add((PreReq) baseTestCase);
+//            }
+//            if (baseTestCase instanceof TestCase) {
+//                currentModule.getTestCases().add((TestCase) baseTestCase);
+//            }
+//            TreeItem<Object> newItem = new TreeItem<>(baseTestCase);
+//            selectedItem.getParent().getChildren().add(newItem);
+//            System.out.println(currentModule);
+//
+//            // Optionally expand the module item to show the new PreReq
+//            selectedItem.getParent().setExpanded(true);
+//        }
+//    }
 }

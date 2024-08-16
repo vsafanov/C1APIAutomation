@@ -14,7 +14,7 @@ public abstract class BaseTestCase extends SelectableBase {
     private String input;
     private boolean skipValidation;
     private String expectedResponseCode;
-    private boolean useAuthentication;
+    private String useAuthentication;
     private String userName;
     private String password;
     private String dbQuery;
@@ -128,11 +128,11 @@ public abstract class BaseTestCase extends SelectableBase {
         this.expectedResponseCode = expectedResponseCode;
     }
 
-    public boolean isUseAuthentication() {
+    public String isUseAuthentication() {
         return useAuthentication;
     }
 
-    public void setUseAuthentication(boolean useAuthentication) {
+    public void setUseAuthentication(String useAuthentication) {
         this.useAuthentication = useAuthentication;
     }
 

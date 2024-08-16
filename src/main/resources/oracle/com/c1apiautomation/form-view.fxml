@@ -57,11 +57,12 @@
               <ComboBox fx:id="cmbRequestType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
               <CheckBox fx:id="chkSkipValidation" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" styleClass="label" text="Skip Validation" GridPane.rowIndex="13" />
               <ComboBox fx:id="cmdResponseCode" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-              <CheckBox fx:id="chkUseAuth" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" styleClass="label" text="Use Authentication" GridPane.rowIndex="8" />
               <Label text="User Name" GridPane.rowIndex="9" />
               <TextField fx:id="txtUserName" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
               <Label text="PreReq Sql" GridPane.rowIndex="15" />
               <TextArea fx:id="taPreReqSql" prefHeight="117.0" prefWidth="259.0" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+            <Label text="Authentication Type" GridPane.rowIndex="8" />
+            <ComboBox fx:id="cmbAuthType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
           </GridPane>
           <GridPane layoutX="471.0" layoutY="9.0" prefHeight="553.0" prefWidth="606.0" AnchorPane.topAnchor="9.0">
               <columnConstraints>

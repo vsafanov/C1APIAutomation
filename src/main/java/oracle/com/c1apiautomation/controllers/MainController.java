@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
+import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,14 +14,13 @@ import javafx.scene.control.*;
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.Utils;
-import oracle.com.c1apiautomation.helpers.CheckBoxTreeTableCell;
-import oracle.com.c1apiautomation.helpers.ContextMenuFactory;
-import oracle.com.c1apiautomation.helpers.ImageTreeTableCell;
-import oracle.com.c1apiautomation.helpers.RequestTypeTreeTableCell;
+import oracle.com.c1apiautomation.helpers.*;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
 
@@ -33,16 +33,79 @@ public class MainController {
     public MenuBar menuBar;
     public MenuItem miLoadJson;
     public VBox root;
+    public Label lblEnv;
+    Root rootData;
+    Environment selectedEnvironment;
 
 
     public void initialize() throws IOException {
         handleLoadFromJson();
+
+    }
+
+    private void createEnvironmentMenus() {
+        var envMenu = menuBar.getMenus().getLast().getItems();
+        envMenu.clear();
+        ToggleGroup toggleGroup = new ToggleGroup();
+
+        lblEnv.getStyleClass().add("label-env-inactive");
+        for (Environment env : rootData.getEnvironments()) {
+            RadioMenuItem mi = new RadioMenuItem(env.getName());
+            mi.setToggleGroup(toggleGroup);
+            mi.setOnAction(e -> {
+                selectedEnvironment = env;
+                lblEnv.getStyleClass().add("label-env-active");
+                lblEnv.setText(env.getName());
+
+                //Has to recreate ContextMenu after environment changed
+                var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment);
+                contextMenu.CreateContextMenu();
+            });
+            envMenu.add(mi);
+        }
+        SeparatorMenuItem smi = new SeparatorMenuItem();
+        envMenu.add(smi);
+        MenuItem config = new MenuItem("Configure");
+        config.setOnAction(this::ConfigureEnvironment);
+        envMenu.add(config);
+    }
+
+    private void ConfigureEnvironment(ActionEvent event) {
+        var mi = ((MenuItem) event.getTarget()).getParentPopup();
+        Scene scene = mi.getScene();
+
+        var envController = new EnvironmentController(scene, rootData.getEnvironments());
+        try {
+            String environmentName = selectedEnvironment != null ? selectedEnvironment.getName() : null;
+            envController.setMainController(this);
+            envController.OpenEnvironmentDialog(environmentName);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void UpdateEnvMenu()
+    {
+        System.out.println(rootData.getEnvironments().size());
+        createEnvironmentMenus();
+    }
+
+    private void clearTreeTableView() {
+        if (ttvContainer.getRoot() != null) {
+            ttvContainer.getRoot().getChildren().clear();
+            ttvContainer.getColumns().clear();
+            ttvContainer.setRoot(null);
+        }
     }
 
     public void LoadTreeTableView(String filePath) throws IOException {
 
+        //clear all treetableview data before load new one
+        clearTreeTableView();
+
         // Load data
-        Root rootData = Utils.readJson(filePath);
+        rootData = Utils.readJson(filePath);
 
         // Add a column for checkboxes
         TreeTableColumn<Object, Boolean> checkBoxColumn = new TreeTableColumn<>("Run Test");
@@ -137,7 +200,7 @@ public class MainController {
         ttvContainer.setEditable(true);
 
         //add context menu
-        var contextMenu = new ContextMenuFactory(ttvContainer);
+        var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment);
         contextMenu.CreateContextMenu();
 
         ttvContainer.setTableMenuButtonVisible(true);
@@ -167,6 +230,7 @@ public class MainController {
 
         if (file != null) {
             LoadTreeTableView(file.getPath());
+            createEnvironmentMenus();
         }
     }
 
@@ -236,15 +300,16 @@ public class MainController {
 
     public void handleLoadTheme(ActionEvent actionEvent) {
         var theme = ((MenuItem) actionEvent.getTarget()).getId();
-        var dark = "/DarkTheme.css";
+        var prefs = UserPreferences.getInstance();
+
         switch (theme) {
             case "miDark":
-                root.getScene().getStylesheets().add(dark);
+                root.getScene().getStylesheets().add(UserPreferences.DARK_THEME);
+                prefs.setString(UserPreferences.USER_THEME_KEY, UserPreferences.DARK_THEME);
                 break;
             case "miLight":
-                root.getScene().getStylesheets().removeIf(s->s.equals(dark));
-//                root.getScene().getStylesheets().clear(); //add("/LightTheme.css");
-//                root.getScene().getStylesheets().add(getClass().getResource("/LightTheme.css").toExternalForm());
+                root.getScene().getStylesheets().removeIf(s -> s.equals(UserPreferences.DARK_THEME));
+                prefs.setString(UserPreferences.USER_THEME_KEY, UserPreferences.LIGHT_THEME);
                 break;
         }
     }

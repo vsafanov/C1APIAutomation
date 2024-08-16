@@ -19,9 +19,8 @@ public class RequestTypeTreeTableCell extends TreeTableCell<Object, String> {
             // Access the item in the cell directly
             // TreeItem<Object> treeItem = getTreeTableRow().getTreeItem();  !!OBSOLETE
             TreeItem<Object> treeItem = getTreeTableView().getTreeItem(getIndex());
-            if (treeItem != null && treeItem.getValue() instanceof BaseTestCase) {
-                BaseTestCase obj = (BaseTestCase) treeItem.getValue();
-                String style = switch (obj.getRequestType().toUpperCase()) {
+            if (treeItem != null && treeItem.getValue() instanceof BaseTestCase testCase) {
+                String style = switch (testCase.getRequestType().toUpperCase()) {
                     case "POST" -> "-fx-text-fill: darkorchid;";
                     case "GET" -> "-fx-text-fill: green;";
                     case "PUT" -> "-fx-text-fill: orange;";

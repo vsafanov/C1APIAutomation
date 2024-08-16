@@ -3,9 +3,10 @@ package oracle.com.c1apiautomation;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.control.Tooltip;
-import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableColumn;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
 //import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.scene.text.Font;
 import javafx.util.Callback;
@@ -36,6 +37,16 @@ public class Utils {
         return text;
     }
 
+    public static FXMLLoader OpenDialog(Dialog dlg, String fxmlFile, Scene scene) throws IOException {
+
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource(fxmlFile));
+        Parent parent = fxmlLoader.load();
+        dlg.setDialogPane((DialogPane) parent);
+
+        dlg.getDialogPane().getStylesheets().addAll(scene.getStylesheets());
+
+        return fxmlLoader;
+    }
 
     public static <T> TreeTableColumn<Object, String> createStringColumn(String header, Class<T> type, Callback<T, String> propertyGetter, double width) {
         TreeTableColumn<Object, String> column = new TreeTableColumn<>(header);

@@ -2,11 +2,13 @@ package oracle.com.c1apiautomation.helpers;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
+import oracle.com.c1apiautomation.controllers.ApiRequestController;
 import oracle.com.c1apiautomation.controllers.EditMode;
 import oracle.com.c1apiautomation.controllers.FormController;
+//import oracle.com.c1apiautomation.controllers.MainController;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
 
@@ -17,14 +19,15 @@ import java.io.IOException;
 public class ContextMenuFactory {
 
     private TreeTableView<Object> treeTableView;
+    private final Environment selectedEnvironment;
     ContextMenu contextMenu;
     private Object clipboardContent;
     private TreeItem<Object> clipboardTreeItem;
 
-    public ContextMenuFactory(TreeTableView<Object> treeTableView) {
+    public ContextMenuFactory(TreeTableView<Object> treeTableView, Environment selectedEnvironment) {
         this.treeTableView = treeTableView;
+        this.selectedEnvironment = selectedEnvironment;
         contextMenu = new ContextMenu();
-
     }
 
     public void CreateContextMenu() {
@@ -34,8 +37,6 @@ public class ContextMenuFactory {
                     contextMenu.getItems().clear();
                     var selectedItem = ((TreeTableView<?>) event.getSource()).getSelectionModel().getSelectedItem();
                     if (selectedItem != null) {
-
-//                        var m = contextMenu.getItems().stream().filter(x->x.getText().equals("Add Microservice")).count();
 
                         switch (selectedItem.getValue()) {
                             case Microservice microservice -> {
@@ -67,7 +68,6 @@ public class ContextMenuFactory {
                                 if (clipboardContent != null && clipboardContent instanceof PreReq) {
                                     createMenuItem("Paste", e -> PasteRecord(), "paste.png");
                                 }
-
                             }
 
                             case TestCase testCase -> {
@@ -79,6 +79,7 @@ public class ContextMenuFactory {
                                 if (clipboardContent != null && clipboardContent instanceof TestCase) {
                                     createMenuItem("Paste", e -> PasteRecord(), "paste.png");
                                 }
+                                createMenuItem("Run Request", e -> RunRequest(e), "");
                             }
                             case null, default -> contextMenu.getItems().add(new MenuItem("Non Existing Type"));
                         }
@@ -91,33 +92,29 @@ public class ContextMenuFactory {
         createInitContextMenu();
     }
 
-    private void AddMicroservice(ActionEvent event, EditMode editMode) {
+    private void RunRequest(ActionEvent event) {
 
+        if (selectedEnvironment == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setHeaderText("");
+            alert.setContentText("Please select the Environment you want to run");
+            alert.showAndWait();
+            if (alert.getResult() == ButtonType.OK) {
+                return;
+            }
+        }
+        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
         var mi = ((MenuItem) event.getTarget()).getParentPopup();
         Scene scene = mi.getScene();
 
-        var formController = new FormController(scene);
-        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
+
+        var apiRequestController = new ApiRequestController(scene, selectedEnvironment);
         try {
-            formController.addMicroservice(selectedItem);
+            var testCase = (TestCase) selectedItem.getValue();
+            apiRequestController.OpenRequestDialog(testCase);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void AddModule(ActionEvent event, EditMode editMode) {
-
-        var mi = ((MenuItem) event.getTarget()).getParentPopup();
-        Scene scene = mi.getScene();
-
-        var formController = new FormController(scene);
-        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
-        try {
-            formController.addModule(selectedItem);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
     }
 
     private void EditRecord(ActionEvent event, EditMode editMode) {
@@ -285,8 +282,14 @@ public class ContextMenuFactory {
 
     private void createMenuItem(String text, EventHandler<ActionEvent> event, String image) {
 
-        var img = ImageFactory.getImageView(image);
-        var mi = new MenuItem(text, img);
+        ImageView img;
+        MenuItem mi;
+        if(image.isEmpty()) {
+            mi = new MenuItem(text);
+        }else{
+            img = ImageFactory.getImageView(image);
+            mi = new MenuItem(text, img);
+        }
         mi.setOnAction(event);
         contextMenu.getItems().add(mi);
     }
