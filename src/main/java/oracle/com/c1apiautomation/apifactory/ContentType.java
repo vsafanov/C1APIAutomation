@@ -1,4 +1,4 @@
-package oracle.com.c1apiautomation.testapifactory;
+package oracle.com.c1apiautomation.apifactory;
 
 public enum ContentType {
     TEXT_PLAIN("text/plain"),
@@ -41,6 +41,10 @@ public enum ContentType {
     ContentType(String contentType) {
         this.contentType = contentType;
 
+    }
+
+    public static ContentType[] getAllValues() {
+        return ContentType.values();
     }
 
     public String getValue() {

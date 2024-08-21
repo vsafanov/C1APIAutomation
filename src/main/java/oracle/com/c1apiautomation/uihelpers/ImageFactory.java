@@ -1,18 +1,15 @@
-package oracle.com.c1apiautomation.helpers;
+package oracle.com.c1apiautomation.uihelpers;
 
 import javafx.scene.image.Image;
 import oracle.com.c1apiautomation.MainApplication;
 
 import java.io.InputStream;
-import java.util.MissingResourceException;
 import java.util.Objects;
 
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class ImageFactory {
     private static final Map<String, Image> imageCache = new HashMap<>();

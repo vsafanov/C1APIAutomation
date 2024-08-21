@@ -1,21 +1,31 @@
 package oracle.com.c1apiautomation.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
+import javafx.scene.input.ContextMenuEvent;
 import oracle.com.c1apiautomation.MainApplication;
+import oracle.com.c1apiautomation.uihelpers.CustomInputContextMenu;
+import oracle.com.c1apiautomation.uihelpers.ImageFactory;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
+import oracle.com.c1apiautomation.apifactory.ContentType;
+import oracle.com.c1apiautomation.apifactory.HttpStatus;
+import oracle.com.c1apiautomation.utils.Util;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class FormController {
@@ -34,11 +44,11 @@ public class FormController {
     public TextField txtPassword;
     public ComboBox<String> cmbRequestType;
     public CheckBox chkSkipValidation;
-    public ComboBox<String> cmdResponseCode;
-//    public CheckBox chkUseAuth;
+    public ComboBox cmdResponseCode;
+    //    public CheckBox chkUseAuth;
     public ComboBox<String> cmbAuthType;
     public TextField txtUserName;
-//    public Button btnSaveAsNew;
+    //    public Button btnSaveAsNew;
     public DialogPane dlgEditBaseTest;
     public DialogPane dlgAddMs;
     public TextArea taPreReqSql;
@@ -54,13 +64,12 @@ public class FormController {
     public TextField txtModule;
 
 
-
 //    private BaseTestCase testCase;
 //    private TreeTableView<Object> treeTableView;
 //    private Stage stage;
 //    private TreeItem<Object> selectedItem;
 
-//    private EditMode editMode;
+    //    private EditMode editMode;
     private Scene scene;
 
     public FormController(Scene scene) {
@@ -74,12 +83,34 @@ public class FormController {
         if (cmbRequestType != null) {
             var requestTypes = FXCollections.observableArrayList("POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS");
             cmbRequestType.setItems(requestTypes);
-            var responseCodes = FXCollections.observableArrayList("200", "201", "202", "204", "400", "403", "404", "500", "NA");
-            cmdResponseCode.setItems(responseCodes);
+//            var responseCodes = FXCollections.observableArrayList("200", "201", "202", "204", "400", "403", "404", "500", "NA");
+//            var responseCodes = FXCollections.observableHashMap();
+//            responseCodes.putAll(HttpStatus.getCodes());
+            cmdResponseCode.getItems().add("");
+            for (Map.Entry<Integer, String> entry : HttpStatus.getCodes().entrySet()) {
+                cmdResponseCode.getItems().add(entry);
+            }
+
+//            cmdResponseCode.setItems(HttpStatus.getCodes());
+            var authTypes = FXCollections.observableArrayList("", "basic", "jwt");
+            cmbAuthType.setItems(authTypes);
+
+            MenuItem mi1 = new MenuItem("Format Json", ImageFactory.getImageView("format.png"));
+            mi1.setOnAction(e -> Util.formatJson(taPayload));
+            CustomInputContextMenu.addMenuItems(taPayload,mi1);
+
+            MenuItem mi2 = new MenuItem("Format Json", ImageFactory.getImageView("format.png"));
+            mi2.setOnAction(e -> Util.formatJson(taExpectedRes));
+            CustomInputContextMenu.addMenuItems(taExpectedRes,mi2);
         }
     }
 
+
+
     private void setBaseTestCase(BaseTestCase model, EditMode editMode) {
+
+        var x = Arrays.stream(ContentType.getAllValues()).map(ContentType::getValue).collect(Collectors.joining(","));
+        System.out.println(x);
 //        this.testCase = model;
 //        this.treeTableView = ttvContainer;
         if (editMode == EditMode.EDIT_PREREQ || editMode == EditMode.EDIT_TESTCASE) {
@@ -90,15 +121,19 @@ public class FormController {
             cmbRequestType.setValue(model.getRequestType());
             txtServiceUrl.setText(model.getServiceUrl());
             txtHeader.setText(model.getHeader());
-            cmdResponseCode.setValue(model.getExpectedResponseCode());
-            cmbAuthType.setValue(model.isUseAuthentication());
+
+            var code = model.getExpectedResponseCode().isEmpty() ? "" : HttpStatus.getByCode(Integer.parseInt(model.getExpectedResponseCode()));
+            cmdResponseCode.setValue(code);
+            cmbAuthType.setValue(model.getUseAuthentication());
             txtUserName.setText(model.getUserName());
             txtPassword.setText(model.getPassword());
             chkSelected.setSelected(model.isSelected());
             chkSkipValidation.setSelected(model.isSkipValidation());
             taPreReqSql.setText(model.getPreReqSql());
-            taPayload.setText(model.getRequestParams());
+            taPayload.setText(model.getPayload());
+            Util.formatJson(taPayload);
             taExpectedRes.setText(model.getExpectedResponse());
+            Util.formatJson(taExpectedRes);
             taInput.setText(model.getInput());
             taDbQuery.setText(model.getDbQuery());
             taExpectedDBRes.setText(model.getExpectedDBResult());
@@ -120,15 +155,15 @@ public class FormController {
         model.setDescription(txtDescription.getText());
         model.setRequestType(cmbRequestType.getValue());
         model.setServiceUrl(txtServiceUrl.getText());
-        model.setHeader(txtHeader.getText());
-        model.setExpectedResponseCode(cmdResponseCode.getValue());
+        var code = cmdResponseCode.getValue() != "" ? ((Map.Entry<Integer, String>) cmdResponseCode.getValue()).getKey().toString() : "";
+        model.setExpectedResponseCode(code);
         model.setUseAuthentication(cmbAuthType.getValue());
         model.setUserName(txtUserName.getText());
         model.setPassword(txtPassword.getText());
         model.setSelected(chkSelected.isSelected());
         model.setSkipValidation(chkSkipValidation.isSelected());
         model.setPreReqSql(taPreReqSql.getText());
-        model.setRequestParams(taPayload.getText());
+        model.setPayload(taPayload.getText());
         model.setExpectedResponse(taExpectedRes.getText());
         model.setInput(taInput.getText());
         model.setDbQuery(taDbQuery.getText());

@@ -1,4 +1,4 @@
-package oracle.com.c1apiautomation.testapifactory;
+package oracle.com.c1apiautomation.apifactory;
 
 import org.jetbrains.annotations.Nullable;
 

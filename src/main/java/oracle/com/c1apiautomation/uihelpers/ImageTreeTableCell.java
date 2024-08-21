@@ -1,19 +1,13 @@
-package oracle.com.c1apiautomation.helpers;
+package oracle.com.c1apiautomation.uihelpers;
 
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.text.Font;
-import javafx.util.Duration;
-import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.model.PreReq;
 import oracle.com.c1apiautomation.model.TestCase;
-import javafx.scene.layout.StackPane;
-
-import java.util.Objects;
 
 public class ImageTreeTableCell extends TreeTableCell<Object, String> {
     private final ImageView imageView;

@@ -1,10 +1,10 @@
 package oracle.com.c1apiautomation.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
-import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -14,17 +14,17 @@ import javafx.scene.control.*;
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import oracle.com.c1apiautomation.MainApplication;
-import oracle.com.c1apiautomation.Utils;
-import oracle.com.c1apiautomation.helpers.*;
+import oracle.com.c1apiautomation.utils.Util;
+import oracle.com.c1apiautomation.uihelpers.*;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
+import oracle.com.c1apiautomation.utils.UserPreferences;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class MainController {
@@ -43,17 +43,55 @@ public class MainController {
 
     }
 
+    private String getSelectedEnvironment() {
+        // Assuming 'menuBar' is your MenuBar instance
+        Menu environmentsMenu = menuBar.getMenus().stream()
+                .filter(menu -> "Environments".equals(menu.getText()))
+                .findFirst()
+                .orElse(null);
+
+        if (environmentsMenu != null) {
+            // Find the selected RadioMenuItem
+            RadioMenuItem selectedItem = environmentsMenu.getItems().stream()
+                    .filter(item -> item instanceof RadioMenuItem)
+                    .map(item -> (RadioMenuItem) item)
+                    .filter(RadioMenuItem::isSelected)
+                    .findFirst()
+                    .orElse(null);
+
+            if (selectedItem != null) {
+                return selectedItem.getText();
+//                System.out.println("Selected item text: " + selectedText);
+            } else {
+
+                System.out.println("No item is selected.");
+                return "";
+            }
+        } else {
+
+            System.out.println("Menu 'Environments' not found.");
+            return "";
+        }
+
+    }
+
     private void createEnvironmentMenus() {
         var envMenu = menuBar.getMenus().getLast().getItems();
+        var selectedText = getSelectedEnvironment();
         envMenu.clear();
         ToggleGroup toggleGroup = new ToggleGroup();
 
         lblEnv.getStyleClass().add("label-env-inactive");
         for (Environment env : rootData.getEnvironments()) {
             RadioMenuItem mi = new RadioMenuItem(env.getName());
+            if(mi.getText().equals(selectedText))
+            {
+                mi.setSelected(true);
+            }
             mi.setToggleGroup(toggleGroup);
             mi.setOnAction(e -> {
                 selectedEnvironment = env;
+                lblEnv.getStyleClass().removeAll("label-env-inactive");
                 lblEnv.getStyleClass().add("label-env-active");
                 lblEnv.setText(env.getName());
 
@@ -63,9 +101,18 @@ public class MainController {
             });
             envMenu.add(mi);
         }
+        var newSelectedText = getSelectedEnvironment();
+        if(newSelectedText.isEmpty())
+        {
+            lblEnv.getStyleClass().add("label-env-inactive");
+            lblEnv.getStyleClass().removeAll("label-env-active");
+            lblEnv.setText("No Environment.");
+            selectedEnvironment = null;
+        }
         SeparatorMenuItem smi = new SeparatorMenuItem();
         envMenu.add(smi);
-        MenuItem config = new MenuItem("Configure");
+
+        MenuItem config = new MenuItem("Configure",ImageFactory.getImageView("configure1.png"));
         config.setOnAction(this::ConfigureEnvironment);
         envMenu.add(config);
     }
@@ -85,9 +132,9 @@ public class MainController {
         }
     }
 
-    public void UpdateEnvMenu()
-    {
+    public void UpdateEnvMenu() {
         System.out.println(rootData.getEnvironments().size());
+//        menuBar.getMenus().getLast().getItems().stream().filter(s-> s instanceof RadioMenuItem).map(s-> ((RadioMenuItem) s)).forEach(radioMenuItem -> radioMenuItem.setSelected(false));
         createEnvironmentMenus();
     }
 
@@ -105,7 +152,7 @@ public class MainController {
         clearTreeTableView();
 
         // Load data
-        rootData = Utils.readJson(filePath);
+        rootData = Util.readJson(filePath);
 
         // Add a column for checkboxes
         TreeTableColumn<Object, Boolean> checkBoxColumn = new TreeTableColumn<>("Run Test");
@@ -117,11 +164,11 @@ public class MainController {
         });
         checkBoxColumn.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn());
 
-        var microserviceColumn = Utils.createStringColumn("Microservice", Microservice.class, Microservice::getName, 100);
+        var microserviceColumn = Util.createStringColumn("Microservice", Microservice.class, Microservice::getName, 100);
         microserviceColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
         microserviceColumn.setOnEditCommit(this::CommitEdit);
 
-        var moduleColumn = Utils.createStringColumn("Module", Module.class, Module::getName, 120); // Adjust accordingly
+        var moduleColumn = Util.createStringColumn("Module", Module.class, Module::getName, 120); // Adjust accordingly
         moduleColumn.setCellFactory(TextFieldTreeTableCell.forTreeTableColumn());
         // Handle updating the Module object when the cell is edited
         moduleColumn.setOnEditCommit(this::CommitEdit);
@@ -131,27 +178,38 @@ public class MainController {
         imageColumn.setCellValueFactory(param -> new SimpleStringProperty("")); // Dummy value
         imageColumn.setCellFactory(column -> new ImageTreeTableCell());
 
-        var idColumn = Utils.createStringColumn("Test Case ID", BaseTestCase.class, BaseTestCase::getId, 150);
-        var titleColumn = Utils.createStringColumn("Title", BaseTestCase.class, BaseTestCase::getTitle, 100);
-        var descriptionColumn = Utils.createStringColumn("Description", BaseTestCase.class, BaseTestCase::getDescription, 100);
+        var idColumn = Util.createStringColumn("Test Case ID", BaseTestCase.class, BaseTestCase::getId, 150);
+        var titleColumn = Util.createStringColumn("Title", BaseTestCase.class, BaseTestCase::getTitle, 100);
+        var descriptionColumn = Util.createStringColumn("Description", BaseTestCase.class, BaseTestCase::getDescription, 100);
 
-        var requestTypeColumn = Utils.createStringColumn("Method", BaseTestCase.class, BaseTestCase::getRequestType, 60);
+        var requestTypeColumn = Util.createStringColumn("Method", BaseTestCase.class, BaseTestCase::getRequestType, 60);
         requestTypeColumn.setCellFactory(column -> new RequestTypeTreeTableCell());
 
-        var requestServiceUrlColumn = Utils.createStringColumn("Service Url", BaseTestCase.class, BaseTestCase::getServiceUrl, 150);
-        var requestRequestParamsColumn = Utils.createStringColumn("Request Params", BaseTestCase.class, BaseTestCase::getRequestParams, 150);
-        var expectedResponseCodeColumn = Utils.createStringColumn("Response Code", BaseTestCase.class, BaseTestCase::getExpectedResponseCode, 100);
-        var userNameColumn = Utils.createStringColumn("User Name", BaseTestCase.class, BaseTestCase::getUserName, 100);
-        var passwordColumn = Utils.createStringColumn("Password", BaseTestCase.class, BaseTestCase::getPassword, 100);
+        var requestServiceUrlColumn = Util.createStringColumn("Service Url", BaseTestCase.class, BaseTestCase::getServiceUrl, 150);
+        var authColumn = Util.createStringColumn("Auth Type", BaseTestCase.class, BaseTestCase::getUseAuthentication, 100);
+        var requestRequestParamsColumn = Util.createStringColumn("Payload", BaseTestCase.class, BaseTestCase::getPayload, 150);
+        var expectedResponseCodeColumn = Util.createStringColumn("Response Code", BaseTestCase.class, BaseTestCase::getExpectedResponseCode, 100);
+        var expectedResponseColumn = Util.createStringColumn("Expected Response", BaseTestCase.class, BaseTestCase::getExpectedResponse, 150);
+
+        var inputColumn = Util.createStringColumn("Input Vars", BaseTestCase.class, BaseTestCase::getInput, 100);
+//        var userNameColumn = Utils.createStringColumn("User Name", BaseTestCase.class, BaseTestCase::getUserName, 100);
+//        var passwordColumn = Utils.createStringColumn("Password", BaseTestCase.class, BaseTestCase::getPassword, 100);
 
         ttvContainer.getColumns().addAll(checkBoxColumn, microserviceColumn, moduleColumn, imageColumn, idColumn,
-                titleColumn, descriptionColumn, requestTypeColumn, requestServiceUrlColumn,
-                requestRequestParamsColumn, expectedResponseCodeColumn, userNameColumn, passwordColumn);
+                titleColumn, descriptionColumn, requestTypeColumn, requestServiceUrlColumn,authColumn,
+                requestRequestParamsColumn, expectedResponseCodeColumn, expectedResponseColumn,inputColumn);
 
         //disable s sorting
         for (var column : ttvContainer.getColumns()) {
             ((TreeTableColumn<?, ?>) column).setSortable(false);
         }
+
+        // Set the row height by creating a custom TreeTableRow factory
+        ttvContainer.setRowFactory(tv -> {
+            TreeTableRow<String> row = new TreeTableRow<>();
+            row.setPrefHeight(30); // Set your desired row height here
+            return row;
+        });
 
         // Add double-click event handler
 //        ttvContainer.setOnMouseClicked(event -> {
@@ -312,6 +370,19 @@ public class MainController {
                 prefs.setString(UserPreferences.USER_THEME_KEY, UserPreferences.LIGHT_THEME);
                 break;
         }
+    }
+
+    public void handleSaveToFromJson(ActionEvent actionEvent) throws JsonProcessingException {
+//        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = JsonConfig.createObjectMapper();
+        var json = mapper.writeValueAsString(rootData);
+            File file = new File("output.json");
+        try (FileWriter writer = new FileWriter(file)) {
+            writer.write(json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+//        System.out.println(json);
     }
 
 

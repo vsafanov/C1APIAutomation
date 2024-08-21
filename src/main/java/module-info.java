@@ -24,12 +24,14 @@ module oracle.com.c1apiautomation {
     exports oracle.com.c1apiautomation;
     exports oracle.com.c1apiautomation.model;
     opens oracle.com.c1apiautomation.model to javafx.fxml;
-    exports oracle.com.c1apiautomation.helpers;
-    opens oracle.com.c1apiautomation.helpers to javafx.fxml;
+    exports oracle.com.c1apiautomation.uihelpers;
+    opens oracle.com.c1apiautomation.uihelpers to javafx.fxml;
     exports oracle.com.c1apiautomation.controllers;
     opens oracle.com.c1apiautomation.controllers to javafx.fxml;
     exports oracle.com.c1apiautomation.controls to javafx.fxml; // Export the package
     opens oracle.com.c1apiautomation.controls to javafx.fxml;
+    exports oracle.com.c1apiautomation.utils;
+    opens oracle.com.c1apiautomation.utils to javafx.fxml;
 
 
 }

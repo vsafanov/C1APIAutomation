@@ -5,24 +5,30 @@ import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-import oracle.com.c1apiautomation.Utils;
+import oracle.com.c1apiautomation.utils.Util;
 import oracle.com.c1apiautomation.controls.ExpandableColoredTextField;
-import oracle.com.c1apiautomation.helpers.ColoredComboBoxCellFactory;
+import oracle.com.c1apiautomation.uihelpers.ColoredComboBoxCellFactory;
 import oracle.com.c1apiautomation.model.Environment;
 import oracle.com.c1apiautomation.model.TestCase;
-import oracle.com.c1apiautomation.testapifactory.ApiClientFactory;
-import oracle.com.c1apiautomation.testapifactory.ApiService;
-import oracle.com.c1apiautomation.testapifactory.ContentType;
+import oracle.com.c1apiautomation.apifactory.ApiClientFactory;
+import oracle.com.c1apiautomation.apifactory.ApiService;
+import oracle.com.c1apiautomation.apifactory.ContentType;
+import oracle.com.c1apiautomation.apifactory.HttpStatus;
 import org.fxmisc.richtext.InlineCssTextArea;
 
 import java.io.IOException;
+import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 public class ApiRequestController {
+
     public ComboBox cmbContentType;
     public DialogPane dlgRunApiRequest;
     public ComboBox cmbAuth;
@@ -32,7 +38,7 @@ public class ApiRequestController {
     public TextArea txtToken;
     public ComboBox cmbMethod;
     public TextField txtUrl;
-    public TextFlow paneToken;
+    public HBox paneToken;
     public GridPane paneBasicAuth;
     public TextArea taResponse;
     public ExpandableColoredTextField customUrl;
@@ -97,8 +103,9 @@ public class ApiRequestController {
 
     public void OpenRequestDialog(TestCase testCase) throws IOException {
         var dlg = new Dialog();
-        dlg.setTitle("Run Request for test case id: " + testCase.getId());
-        var fxmlLoader = Utils.OpenDialog(dlg, "apirequest-view.fxml",scene);
+        dlg.setResizable(true);
+        dlg.setTitle("Test Case Id: " + testCase.getId());
+        var fxmlLoader = Util.OpenDialog(dlg, "apirequest-view.fxml",scene);
         var controller = (ApiRequestController) fxmlLoader.getController();
         controller.setRequestModel(testCase);
         controller.setSelectedEnvironment(this.selectedEnvironment);
@@ -111,7 +118,7 @@ public class ApiRequestController {
 
     private void setRequestModel(TestCase testCase) {
         cmbMethod.setValue(testCase.getRequestType());
-        var selectedAuth = switch (testCase.isUseAuthentication().toLowerCase()) {
+        var selectedAuth = switch (testCase.getUseAuthentication().toLowerCase()) {
             case "basic" -> "Basic Auth";
             case "bearer" -> "Bearer Auth";
             default -> "No Auth";
@@ -119,7 +126,8 @@ public class ApiRequestController {
         cmbAuth.setValue(selectedAuth);
         updateAuthPanel(selectedAuth);
         cmbContentType.setValue(testCase.getHeader());
-        taBody.setText(testCase.getRequestParams());
+        taBody.setText(testCase.getPayload());
+        Util.formatJson(taBody);
 //        txtUrl.setText(testCase.getServiceUrl());
         customUrl.setFullText(testCase.getServiceUrl());
         txtUsername.setText(testCase.getUserName());
@@ -134,12 +142,15 @@ public class ApiRequestController {
         ApiClientFactory clientFactory = new ApiClientFactory();
 //        clientFactory.setBaseUrl("http://localhost:5185/api");
         selectedEnvironment.getVars().setProperty("test","test");
-        var baseUrl = selectedEnvironment.getConfiguration().getProperties().get("baseUrl");
 
-        String fullUrl = customUrl.getText().replace("{{baseUrl}}", baseUrl);
+//        var baseUrl = selectedEnvironment.getVars().getProperties().get("baseUrl");
+//        String fullUrl = customUrl.getText().replace("{{baseUrl}}", baseUrl);
+
+        var parsedUrl = Util.replaceVarPlaceholder(customUrl.getText(),selectedEnvironment.getVars().getProperties());
 
         if (cmbAuth.getValue().equals("Bearer Auth")) {
-            clientFactory.setJwtToken(txtToken.textProperty().getValue());
+            var parsedToken = Util.replaceVarPlaceholder(txtToken.getText(),selectedEnvironment.getVars().getProperties());
+            clientFactory.setJwtToken(parsedToken);
         }
         if (cmbAuth.getValue().equals("Basic Auth")) {
             if (txtUsername.getText().isEmpty() || txtPwd.getText().isEmpty()) {
@@ -152,31 +163,37 @@ public class ApiRequestController {
                 }
             }
             clientFactory.setBasicAuth(txtUsername.textProperty().getValue(), txtPwd.textProperty().getValue());
-
         }
 
         ApiService apiService = new ApiService(clientFactory);
 
-//        String jsonBody = "{\"key\":\"value\"}";
         HttpResponse<String> response = null;
         try {
             //            response = apiService.sendPostRequest("/register", null, ContentType.TEXT_PLAIN.getValue());
             response = switch (cmbMethod.getValue().toString()) {
                 case "POST" ->
-                        apiService.sendPostRequest(fullUrl, taBody.getText(), cmbContentType.getValue().toString());
-                case "GET" -> apiService.sendGetRequest(fullUrl, cmbContentType.getValue().toString());
-                case "PUT" -> apiService.sendPutRequest(fullUrl, taBody.getText());
-                case "DELETE" -> apiService.sendDeleteRequest(fullUrl, cmbContentType.getValue().toString());
+                        apiService.sendPostRequest(parsedUrl, taBody.getText(), cmbContentType.getValue().toString());
+                case "GET" -> apiService.sendGetRequest(parsedUrl, cmbContentType.getValue().toString());
+                case "PUT" -> apiService.sendPutRequest(parsedUrl, taBody.getText());
+                case "DELETE" -> apiService.sendDeleteRequest(parsedUrl, cmbContentType.getValue().toString());
                 default -> response;
             };
+            var header = "";
             if (response.statusCode() >= 400) {
                 taResponse.setStyle("-fx-text-fill: red");
+                header =  "\n\n" + getHeadersText(response.headers()) + "\n";
+
             } else {
                 taResponse.setStyle("-fx-text-fill: green");
             }
-            var text = "Status: " + response.statusCode() + " \n\n" + response.body();
+
+            var text = "Status: " + response.statusCode() + " "
+                    + HttpStatus.getDescription(response.statusCode())
+                    + header
+                    + " \n\n" + response.body();
 
             taResponse.setText(text);
+            Util.formatJson(taResponse);
             System.out.println("Status Code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
 
@@ -188,6 +205,23 @@ public class ApiRequestController {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private String getHeadersText(HttpHeaders headers) {
+        StringBuilder headersText = new StringBuilder();
+
+        for (Map.Entry<String, List<String>> entry : headers.map().entrySet()) {
+            String headerName = entry.getKey();
+            List<String> headerValues = entry.getValue();
+
+            // Join multiple values for the same header
+            String headerValue = String.join(", ", headerValues);
+
+            // Append the header name and value to the StringBuilder
+            headersText.append(headerName).append(": ").append(headerValue).append("\n");
+        }
+
+        return headersText.toString();
     }
 
     public void onAuthChanged(ActionEvent actionEvent) {

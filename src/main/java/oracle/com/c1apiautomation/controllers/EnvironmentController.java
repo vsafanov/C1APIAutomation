@@ -7,14 +7,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
-import oracle.com.c1apiautomation.MainApplication;
-import oracle.com.c1apiautomation.Utils;
-import oracle.com.c1apiautomation.helpers.ImageFactory;
+import javafx.util.Callback;
+import javafx.util.converter.DefaultStringConverter;
+import oracle.com.c1apiautomation.utils.Util;
+import oracle.com.c1apiautomation.uihelpers.ImageFactory;
 import oracle.com.c1apiautomation.model.Environment;
 import oracle.com.c1apiautomation.model.PropertyItem;
 import oracle.com.c1apiautomation.model.Vars;
-import oracle.com.c1apiautomation.testapifactory.ContentType;
 
 import java.io.IOException;
 import java.util.*;
@@ -72,12 +74,15 @@ public class EnvironmentController {
         colValue.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         // Bind the second column to take the remaining width of the table
-        colValue.prefWidthProperty().bind(tblEnv.widthProperty().subtract(colName.getPrefWidth()) );
+        colValue.prefWidthProperty().bind(tblEnv.widthProperty().subtract(colName.getPrefWidth()));
 
         // Enable cell editing
         tblEnv.setEditable(true);
-        colName.setCellFactory(TextFieldTableCell.forTableColumn());
-        colValue.setCellFactory(TextFieldTableCell.forTableColumn());
+        colName.setCellFactory(getEditingCellFactory());
+        colValue.setCellFactory(getEditingCellFactory());
+
+//        colName.setCellFactory(TextFieldTableCell.forTableColumn());
+//        colValue.setCellFactory(TextFieldTableCell.forTableColumn());
 
         // Commit edit handlers for name and value columns
         colName.setOnEditCommit(event -> updateKey(event.getRowValue().getName(), event.getNewValue()));
@@ -85,14 +90,56 @@ public class EnvironmentController {
 
         // Context menu for adding and removing items
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem addItem = new MenuItem("Add");
-        MenuItem removeItem = new MenuItem("Remove");
+        MenuItem addItem = new MenuItem("Add Variable", ImageFactory.getImageView("new.png"));
+        MenuItem removeItem = new MenuItem("Remove Variable", ImageFactory.getImageView("trash.png"));
 
         addItem.setOnAction(e -> addEntry());
         removeItem.setOnAction(e -> removeEntry(tblEnv.getSelectionModel().getSelectedItem()));
 
         contextMenu.getItems().addAll(addItem, removeItem);
         tblEnv.setContextMenu(contextMenu);
+    }
+
+    private Callback<TableColumn<PropertyItem, String>, TableCell<PropertyItem, String>> getEditingCellFactory() {
+        return column -> {
+            TextFieldTableCell<PropertyItem, String> cell = new TextFieldTableCell<>(new DefaultStringConverter()) {
+                @Override
+
+                public void startEdit() {
+                    super.startEdit();
+                    TextField textField = getGraphic() instanceof TextField ? (TextField) getGraphic() : null;
+
+                    if (textField != null) {
+                        // Prevent automatic selection of text
+                        textField.positionCaret(textField.getText().length());
+                        // Commit the edit when the TextField loses focus
+                        textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                            if (!newValue && isEditing()) {
+                                commitEdit(textField.getText());
+                            }
+                        });
+                    }
+                }
+            };
+
+            // Start editing on single-click
+            cell.setOnMouseClicked(event -> {
+                if (!cell.isEmpty() && !cell.isEditing() && event.getButton() == MouseButton.PRIMARY) {
+                    cell.startEdit();
+                }
+            });
+
+            // Commit the edit when Enter is pressed
+            cell.setOnKeyPressed(event -> {
+                if (event.getCode() == KeyCode.ENTER) {
+                    cell.commitEdit(cell.getText());
+                } else if (event.getCode() == KeyCode.ESCAPE) {
+                    cell.cancelEdit();
+                }
+            });
+
+            return cell;
+        };
     }
 
     private Environment getEnvironmentByName(String name) {
@@ -103,8 +150,9 @@ public class EnvironmentController {
 
     public void OpenEnvironmentDialog(String name) throws IOException {
         var dlg = new Dialog();
-        dlg.setTitle("ENVIRONMENTS");
-        var fxmlLoader = Utils.OpenDialog(dlg, "environment-view.fxml", scene);
+
+        dlg.setTitle("Environments");
+        var fxmlLoader = Util.OpenDialog(dlg, "environment-view.fxml", scene);
         var controller = (EnvironmentController) fxmlLoader.getController();
 
         controller.environments = environments;
@@ -239,7 +287,7 @@ public class EnvironmentController {
 
     public void onCopyEnv(ActionEvent actionEvent) {
 //        var dialog = createDialog("Copy Environment", "New Environment Name");
-        var dialog = createInputDialog("Copy Environment","New Environment Name",selectedEnvironment.getName() + "- Copy");
+        var dialog = createInputDialog("Copy Environment", "New Environment Name", selectedEnvironment.getName() + "- Copy");
         Optional<String> result = dialog.showAndWait();
 
         result.ifPresent(name -> {
@@ -257,7 +305,7 @@ public class EnvironmentController {
 
     public void onRenameEnv(ActionEvent actionEvent) {
         if (selectedEnvironment != null) {
-            var dialog = createInputDialog("Rename Environment","Environment Name",selectedEnvironment.getName());
+            var dialog = createInputDialog("Rename Environment", "Environment Name", selectedEnvironment.getName());
 
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(newName -> {
@@ -268,7 +316,8 @@ public class EnvironmentController {
             });
         }
     }
-    private Dialog<String> createInputDialog(String title, String labelText, String textboxText ){
+
+    private Dialog<String> createInputDialog(String title, String labelText, String textboxText) {
         TextInputDialog dialog = new TextInputDialog(textboxText);
         dialog.setTitle(title);
         dialog.setHeaderText(null);
@@ -309,7 +358,6 @@ public class EnvironmentController {
 
         return dialog;
     }
-
 
 
 //    private void updateHashMap(String key, String value) {

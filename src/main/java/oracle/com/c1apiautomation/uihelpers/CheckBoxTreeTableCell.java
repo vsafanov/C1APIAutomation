@@ -1,4 +1,4 @@
-package oracle.com.c1apiautomation.helpers;
+package oracle.com.c1apiautomation.uihelpers;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.*;
 import javafx.util.Callback;

@@ -1,7 +1,6 @@
-package oracle.com.c1apiautomation.helpers;
+package oracle.com.c1apiautomation.uihelpers;
 
 import javafx.scene.control.TreeTableCell;
-import javafx.scene.control.TreeTableRow;
 import javafx.scene.control.TreeItem;
 import oracle.com.c1apiautomation.model.BaseTestCase;
 

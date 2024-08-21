@@ -44,7 +44,7 @@ public class ExpandableColoredTextField extends InlineCssTextArea {
             if (newVal) { // Gained focus
                 setPrefHeight(MULTI_LINE_HEIGHT);
                 setWrapText(true); // Enable wrapping in multi-line mode
-                allStyles += "-fx-border-color: #3399FF ; -fx-border-width: 2;";
+                allStyles += "-fx-border-color: #3399FF ; -fx-border-width: 1;";
             } else { // Lost focus
                 setPrefHeight(SINGLE_LINE_HEIGHT);
                 setWrapText(false);

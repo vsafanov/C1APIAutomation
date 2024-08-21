@@ -1,21 +1,23 @@
-package oracle.com.c1apiautomation;
+package oracle.com.c1apiautomation.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 //import javafx.scene.control.cell.CheckBoxTreeTableCell;
-import javafx.scene.text.Font;
 import javafx.util.Callback;
+import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.model.Root;
 
 import java.io.*;
 import java.util.Map;
 
-public class Utils {
+public class Util {
 
     public static Root readJson(String filePath) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -23,7 +25,19 @@ public class Utils {
         });
     }
 
-    public static String replacePlaceholders(String text, Map<String, String> placeholders) {
+    public static void formatJson(TextInputControl input) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
+
+            var json = writer.writeValueAsString(mapper.readValue(input.getText(), Object.class));
+            input.setText(json);
+        } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static String replaceVarPlaceholder(String text, Map<String, String> placeholders) {
         if (text == null || placeholders == null) {
             return text;
         }

@@ -60,7 +60,7 @@
 .grid-pane-border {
     -fx-border-color: #AFB1B3;
     -fx-padding: 8;
-    -fx-border-width: 1;
+    -fx-border-width: 0.2;
     -fx-border-radius: 5;
 }
 
@@ -85,4 +85,8 @@
     -fx-alignment: center;
     -fx-cursor: HAND;
     cursor: HAND;
+}
+
+.dialog-title {
+    -fx-font-weight: bold;
 }

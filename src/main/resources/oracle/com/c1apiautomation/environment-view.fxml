@@ -21,9 +21,9 @@
                     <TableColumn fx:id="colValue" prefWidth="200.0" text="Value"/>
                 </columns>
             </TableView>
-            <ComboBox fx:id="cmbEnv" layoutX="89.0" layoutY="22.0" onAction="#onEnvChanged" prefWidth="150.0"
-                      promptText="No Environment"/>
-            <Label layoutX="11.0" layoutY="26.0" text="Environment"/>
+            <ComboBox fx:id="cmbEnv" layoutX="89.0" layoutY="22.0" onAction="#onEnvChanged" prefWidth="150.0" AnchorPane.leftAnchor="0"
+                      promptText="No Environment" style="-fx-font-weight: bold;"/>
+<!--            <Label layoutX="11.0" layoutY="26.0" text="Environment"/>-->
             <Button fx:id="btnRename" layoutX="518.0" layoutY="22.0" mnemonicParsing="false" onAction="#onRenameEnv"
                     AnchorPane.rightAnchor="80"/>
             <Button fx:id="btnCopy" layoutX="543.0" layoutY="22.0" mnemonicParsing="false" onAction="#onCopyEnv"

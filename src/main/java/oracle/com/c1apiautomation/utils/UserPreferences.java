@@ -1,4 +1,4 @@
-package oracle.com.c1apiautomation.helpers;
+package oracle.com.c1apiautomation.utils;
 
 import java.util.prefs.Preferences;
 import java.util.Map;

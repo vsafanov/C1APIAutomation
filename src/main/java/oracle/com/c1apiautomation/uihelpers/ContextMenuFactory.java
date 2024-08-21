@@ -1,4 +1,4 @@
-package oracle.com.c1apiautomation.helpers;
+package oracle.com.c1apiautomation.uihelpers;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -8,7 +8,6 @@ import javafx.scene.image.ImageView;
 import oracle.com.c1apiautomation.controllers.ApiRequestController;
 import oracle.com.c1apiautomation.controllers.EditMode;
 import oracle.com.c1apiautomation.controllers.FormController;
-//import oracle.com.c1apiautomation.controllers.MainController;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
 
@@ -40,46 +39,46 @@ public class ContextMenuFactory {
 
                         switch (selectedItem.getValue()) {
                             case Microservice microservice -> {
-                                createMenuItem("Add New Microservice", e -> EditRecord(e, EditMode.ADD_MICROSERVICE), "addItem.png");
-                                createMenuItem("Delete Microservice", e -> DeleteRecord(), "deleteItem.png");
-                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "addItem.png");
+                                createMenuItem("Add New Microservice", e -> EditRecord(e, EditMode.ADD_MICROSERVICE), "new.png");
+                                createMenuItem("Delete Microservice", e -> DeleteRecord(), "trash.png");
+                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "new.png");
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && (clipboardContent instanceof Microservice || clipboardContent instanceof Module)) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
                                 }
                             }
                             case Module module -> {
-                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "addItem.png");
-                                createMenuItem("Delete Module", e -> DeleteRecord(), "deleteItem.png");
-                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "addItem.png");
-                                createMenuItem("Add New Test", e -> EditRecord(e, EditMode.ADD_TESTCASE), "addItem.png");
+                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "new.png");
+                                createMenuItem("Delete Module", e -> DeleteRecord(), "trash.png");
+                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "new.png");
+                                createMenuItem("Add New Test", e -> EditRecord(e, EditMode.ADD_TESTCASE), "new.png");
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && (clipboardContent instanceof BaseTestCase || clipboardContent instanceof Module)) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
                                 }
 
                             }
                             case PreReq preReq -> {
-                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "addItem.png");
-                                createMenuItem("Edit PreReq", e -> EditRecord(e, EditMode.EDIT_PREREQ), "editItem.png");
-                                createMenuItem("Delete PreReq", e -> DeleteRecord(), "deleteItem.png");
+                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "new.png");
+                                createMenuItem("Edit PreReq", e -> EditRecord(e, EditMode.EDIT_PREREQ), "editcolor.png");
+                                createMenuItem("Delete PreReq", e -> DeleteRecord(), "trash.png");
 
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && clipboardContent instanceof PreReq) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
                                 }
                             }
 
                             case TestCase testCase -> {
-                                createMenuItem("Add New Test Case", e -> EditRecord(e, EditMode.ADD_TESTCASE), "addItem.png");
-                                createMenuItem("Edit Test Case", e -> EditRecord(e, EditMode.EDIT_TESTCASE), "editItem.png");
-                                createMenuItem("Delete Test Case", e -> DeleteRecord(), "deleteItem.png");
+                                createMenuItem("Add New Test Case", e -> EditRecord(e, EditMode.ADD_TESTCASE), "new.png");
+                                createMenuItem("Edit Test Case", e -> EditRecord(e, EditMode.EDIT_TESTCASE), "editcolor.png");
+                                createMenuItem("Delete Test Case", e -> DeleteRecord(), "trash.png");
 
                                 createMenuItem("Copy", e -> CopyRecord(), "copy.png");
                                 if (clipboardContent != null && clipboardContent instanceof TestCase) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "paste.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
                                 }
-                                createMenuItem("Run Request", e -> RunRequest(e), "");
+                                createMenuItem("Run Request", e -> RunRequest(e), "runrequest5.png");
                             }
                             case null, default -> contextMenu.getItems().add(new MenuItem("Non Existing Type"));
                         }
@@ -99,9 +98,9 @@ public class ContextMenuFactory {
             alert.setHeaderText("");
             alert.setContentText("Please select the Environment you want to run");
             alert.showAndWait();
-            if (alert.getResult() == ButtonType.OK) {
+//            if (alert.getResult() == ButtonType.OK) {
                 return;
-            }
+//            }
         }
         var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
         var mi = ((MenuItem) event.getTarget()).getParentPopup();

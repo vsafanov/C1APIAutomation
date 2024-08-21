@@ -27,17 +27,17 @@ public abstract class BaseTestCase extends SelectableBase {
 
     }
 
-    public BaseTestCase(String type) {
-        this.type = type;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
+//    public BaseTestCase(String type) {
+//        this.type = type;
+//    }
+//
+//    public String getType() {
+//        return type;
+//    }
+//
+//    public void setType(String type) {
+//        this.type = type;
+//    }
 
     // Getters and Setters
     public String getId() {
@@ -80,11 +80,11 @@ public abstract class BaseTestCase extends SelectableBase {
         this.serviceUrl = serviceUrl;
     }
 
-    public String getRequestParams() {
+    public String getPayload() {
         return requestParams;
     }
 
-    public void setRequestParams(String requestParams) {
+    public void setPayload(String requestParams) {
         this.requestParams = requestParams;
     }
 
@@ -128,7 +128,7 @@ public abstract class BaseTestCase extends SelectableBase {
         this.expectedResponseCode = expectedResponseCode;
     }
 
-    public String isUseAuthentication() {
+    public String getUseAuthentication() {
         return useAuthentication;
     }
 
