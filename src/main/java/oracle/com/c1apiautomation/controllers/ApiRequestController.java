@@ -1,16 +1,17 @@
 package oracle.com.c1apiautomation.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
+import oracle.com.c1apiautomation.model.Vars;
 import oracle.com.c1apiautomation.utils.Util;
 import oracle.com.c1apiautomation.controls.ExpandableColoredTextField;
-import oracle.com.c1apiautomation.uihelpers.ColoredComboBoxCellFactory;
 import oracle.com.c1apiautomation.model.Environment;
 import oracle.com.c1apiautomation.model.TestCase;
 import oracle.com.c1apiautomation.apifactory.ApiClientFactory;
@@ -22,9 +23,10 @@ import org.fxmisc.richtext.InlineCssTextArea;
 import java.io.IOException;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+//import static oracle.com.c1apiautomation.uiexecutionengine.RulesProcessor.objectMapper;
 
 
 public class ApiRequestController {
@@ -45,10 +47,13 @@ public class ApiRequestController {
     public InlineCssTextArea taInline;
     private Scene scene;
     private Environment selectedEnvironment;
+    private Vars runtimeVars;
+    private String input;
 
-    public ApiRequestController(Scene scene, Environment selectedEnvironment) {
+    public ApiRequestController(Scene scene, Environment selectedEnvironment, Vars runtimeVars) {
         this.scene = scene;
         this.selectedEnvironment = selectedEnvironment;
+        this.runtimeVars = runtimeVars;
     }
 
     public ApiRequestController() {
@@ -67,34 +72,8 @@ public class ApiRequestController {
 
             cmbContentType.getItems().addAll(ContentType.TEXT_PLAIN.getValue(), ContentType.APPLICATION_JSON.getValue(), ContentType.APPLICATION_XML.getValue());
 
-//            var requestTypes = FXCollections.observableArrayList("POST", "GET", "PUT", "PATCH", "DELETE");
-
             //create colored combo box for cmbMethod
-            HashMap<String, Color> colorMap = new HashMap<>();
-            colorMap.put("POST", Color.DARKORCHID);
-            colorMap.put("GET", Color.DARKGREEN);
-            colorMap.put("PUT", Color.ORANGE);
-            colorMap.put("PATCH", Color.PURPLE);
-            colorMap.put("DELETE", Color.CORAL);
-            cmbMethod.setItems(FXCollections.observableArrayList(colorMap.keySet()));
-
-            cmbMethod.setCellFactory(new ColoredComboBoxCellFactory<>(colorMap, true));
-            cmbMethod.setButtonCell(new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setGraphic(null);
-                    } else {
-                        Text text = new Text(item);
-                        Color color = colorMap.getOrDefault(item, Color.BLACK);
-                        text.setFill(color);
-                        text.setStyle("-fx-font-weight: bold");
-                        setGraphic(text);
-                    }
-                }
-            });
+            Util.loadCmbMethod(cmbMethod);
 
             var auth = FXCollections.observableArrayList("No Auth", "Basic Auth", "Bearer Auth");
             cmbAuth.setItems(auth);
@@ -109,6 +88,7 @@ public class ApiRequestController {
         var controller = (ApiRequestController) fxmlLoader.getController();
         controller.setRequestModel(testCase);
         controller.setSelectedEnvironment(this.selectedEnvironment);
+        controller.runtimeVars = this.runtimeVars;
         dlg.showAndWait();
         if (dlg.getResult() == ButtonType.OK) {
 
@@ -117,6 +97,8 @@ public class ApiRequestController {
     }
 
     private void setRequestModel(TestCase testCase) {
+        input = testCase.getInput();
+        txtToken.setText(testCase.getToken());
         cmbMethod.setValue(testCase.getRequestType());
         var selectedAuth = switch (testCase.getUseAuthentication().toLowerCase()) {
             case "basic" -> "Basic Auth";
@@ -125,9 +107,9 @@ public class ApiRequestController {
         };
         cmbAuth.setValue(selectedAuth);
         updateAuthPanel(selectedAuth);
-        cmbContentType.setValue(testCase.getHeader());
-        taBody.setText(testCase.getPayload());
-        Util.formatJson(taBody);
+        cmbContentType.setValue(testCase.getContentType());
+        taBody.setText(Util.formatJson(testCase.getPayload()));
+//        Util.formatJson(taBody);
 //        txtUrl.setText(testCase.getServiceUrl());
         customUrl.setFullText(testCase.getServiceUrl());
         txtUsername.setText(testCase.getUserName());
@@ -137,19 +119,14 @@ public class ApiRequestController {
     }
 
     public void RunRequest(ActionEvent actionEvent) {
-        // Using Basic Auth
 
         ApiClientFactory clientFactory = new ApiClientFactory();
-//        clientFactory.setBaseUrl("http://localhost:5185/api");
-        selectedEnvironment.getVars().setProperty("test","test");
-
-//        var baseUrl = selectedEnvironment.getVars().getProperties().get("baseUrl");
-//        String fullUrl = customUrl.getText().replace("{{baseUrl}}", baseUrl);
 
         var parsedUrl = Util.replaceVarPlaceholder(customUrl.getText(),selectedEnvironment.getVars().getProperties());
 
         if (cmbAuth.getValue().equals("Bearer Auth")) {
-            var parsedToken = Util.replaceVarPlaceholder(txtToken.getText(),selectedEnvironment.getVars().getProperties());
+//            var parsedToken = Util.replaceVarPlaceholder(txtToken.getText(),selectedEnvironment.getVars().getProperties());
+            var parsedToken = Util.replaceVarPlaceholder(txtToken.getText(),runtimeVars.getProperties());
             clientFactory.setJwtToken(parsedToken);
         }
         if (cmbAuth.getValue().equals("Basic Auth")) {
@@ -178,7 +155,19 @@ public class ApiRequestController {
                 case "DELETE" -> apiService.sendDeleteRequest(parsedUrl, cmbContentType.getValue().toString());
                 default -> response;
             };
-            var header = "";
+
+
+            if(!input.isEmpty()) {
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode inputNode = objectMapper.readTree(input);
+                String source = inputNode.get("source").asText();
+                var vars = inputNode.get("vars").asText();
+                if ("body".equalsIgnoreCase(source) && response != null) {
+                    runtimeVars.getProperties().put(vars, response.body());
+                }
+            }
+
+                        var header = "";
             if (response.statusCode() >= 400) {
                 taResponse.setStyle("-fx-text-fill: red");
                 header =  "\n\n" + getHeadersText(response.headers()) + "\n";
@@ -192,8 +181,8 @@ public class ApiRequestController {
                     + header
                     + " \n\n" + response.body();
 
-            taResponse.setText(text);
-            Util.formatJson(taResponse);
+            taResponse.setText(Util.formatJson(text));
+//            Util.formatJson(taResponse);
             System.out.println("Status Code: " + response.statusCode());
             System.out.println("Response Body: " + response.body());
 
@@ -202,9 +191,30 @@ public class ApiRequestController {
             System.out.println(error);
             taResponse.setText(error);
             taResponse.setStyle("-fx-text-fill: red");
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
 
+    }
+
+    public void addVarFromJson(String jsonString, Vars currentVars) throws JsonProcessingException {
+        // Create ObjectMapper instance
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Parse the JSON string into a JsonNode
+        JsonNode jsonNode = objectMapper.readTree(jsonString);
+
+        // Iterate over the fields in the JSON node
+        jsonNode.fields().forEachRemaining(field -> {
+            String key = field.getKey();
+            String value = field.getValue().asText();
+
+            // Replace the placeholder with the actual value
+            String actualValue = Util.replaceVarPlaceholder(value,currentVars.getProperties());
+//            String actualValue = value.replace("{{body}}", "my body value");
+
+            // Put the entry into the HashMap
+            currentVars.setProperty(key, actualValue);
+        });
     }
 
     private String getHeadersText(HttpHeaders headers) {

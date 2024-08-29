@@ -1,8 +1,10 @@
 package oracle.com.c1apiautomation.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public abstract class BaseTestCase extends SelectableBase {
-//    private final BooleanProperty selected  = new SimpleBooleanProperty();
+    //    private final BooleanProperty selected  = new SimpleBooleanProperty();
     private String id;
     private String title;
     private String description;
@@ -10,7 +12,7 @@ public abstract class BaseTestCase extends SelectableBase {
     private String serviceUrl;
     private String requestParams;
     private String expectedResponse;
-    private String header;
+    private String contentType;
     private String input;
     private boolean skipValidation;
     private String expectedResponseCode;
@@ -21,7 +23,9 @@ public abstract class BaseTestCase extends SelectableBase {
     private String expectedDBResult;
     private String tearDownSql;
     private String preReqSql;
+    private String release;
     private String type;
+    private String token = "{{token}}"; //set the default value, just for runtime, not being stored in json
 
     public BaseTestCase() {
 
@@ -40,12 +44,31 @@ public abstract class BaseTestCase extends SelectableBase {
 //    }
 
     // Getters and Setters
+
+    @JsonIgnore
+    public String getToken() {
+        return token;
+    }
+
+    @JsonIgnore
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getRelease() {
+        return release;
+    }
+
+    public void setRelease(String release) {
+        this.release = release;
     }
 
     public String getTitle() {
@@ -96,12 +119,12 @@ public abstract class BaseTestCase extends SelectableBase {
         this.expectedResponse = expectedResponse;
     }
 
-    public String getHeader() {
-        return header;
+    public String getContentType() {
+        return contentType;
     }
 
-    public void setHeader(String header) {
-        this.header = header;
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
     public String getInput() {
@@ -189,6 +212,7 @@ public abstract class BaseTestCase extends SelectableBase {
         // TODO: copy mutable state here, so the clone can't change the internals of the original
         return (BaseTestCase) super.clone();
     }
+
 
 //    public boolean isSelected() {
 //        return selected.get();

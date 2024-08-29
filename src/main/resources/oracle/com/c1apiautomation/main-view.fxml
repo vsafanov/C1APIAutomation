@@ -20,7 +20,7 @@
     <MenuBar fx:id="menuBar">
         <Menu text="File">
             <MenuItem fx:id="miLoadJson" onAction="#handleLoadFromJson" text="Load From JSON" />
-            <MenuItem fx:id="miSaveToJson" onAction="#handleSaveToFromJson" text="Save To JSON"  >
+            <MenuItem fx:id="miSaveToJson" onAction="#handleSaveToJson" text="Save To JSON"  >
                 <graphic>
                     <ImageView>
                         <Image url="@images/icon-save-as-16.png"/>

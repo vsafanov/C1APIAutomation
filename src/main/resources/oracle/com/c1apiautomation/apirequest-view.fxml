@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonType?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.TextFlow?>
+
+<?import oracle.com.c1apiautomation.controls.ExpandableColoredTextField?>
+<!--<?import org.fxmisc.richtext.InlineCssTextArea?>-->
+
+<?import javafx.scene.layout.VBox?>
+<DialogPane  prefHeight="500.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/22"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="oracle.com.c1apiautomation.controllers.ApiRequestController">
+    <content>
+        <VBox spacing="10.0" >
+        <AnchorPane prefHeight="452.0" prefWidth="730.0" VBox.vgrow="ALWAYS" >
+            <SplitPane dividerPositions="0.5" layoutX="20.8" layoutY="40.8" prefHeight="411.0" prefWidth="730.0" VBox.vgrow="ALWAYS"
+                       AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                       AnchorPane.topAnchor="41.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                    <Label layoutX="11.0" layoutY="250.0" prefHeight="17.0" prefWidth="88.0" text="Content Type"
+                           AnchorPane.bottomAnchor="121" AnchorPane.leftAnchor="10.0"/>
+                    <ComboBox fx:id="cmbContentType" layoutX="109.0" layoutY="242.0" prefHeight="25.0" prefWidth="186.0"
+                              AnchorPane.bottomAnchor="122"/>
+                    <Label layoutX="11.0" layoutY="282.0" prefHeight="18.0" prefWidth="79.0" text="Authorization"
+                           AnchorPane.bottomAnchor="88" AnchorPane.leftAnchor="10.0"/>
+                    <ComboBox fx:id="cmbAuth" layoutX="111.0" layoutY="274.0" onAction="#onAuthChanged"
+                              prefHeight="26.0" prefWidth="186.0" AnchorPane.bottomAnchor="88"
+                              AnchorPane.leftAnchor="111.0"/>
+                    <Label layoutX="10.4" layoutY="37.0" text="Body" AnchorPane.leftAnchor="10.0"
+                           AnchorPane.topAnchor="0.0"/>
+                    <TextArea fx:id="taBody" layoutX="-2.0" layoutY="32.0" prefHeight="222.0" prefWidth="342.0"
+                              wrapText="true" AnchorPane.bottomAnchor="156.0" AnchorPane.leftAnchor="10.0"
+                              AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="20.0"/>
+                    <GridPane fx:id="paneBasicAuth" layoutX="10.40" layoutY="337" prefHeight="76.0" prefWidth="330.0"
+                              styleClass="grid-pane-border" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="10" AnchorPane.leftAnchor="10">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="176" minWidth="10.0" prefWidth="99"/>
+                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="243" minWidth="10.0" prefWidth="188"/>
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES"/>
+                            <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES"/>
+                        </rowConstraints>
+                        <Label prefHeight="18.0" prefWidth="70.0" text="User Name"/>
+                        <TextField fx:id="txtUsername" prefHeight="26.0" prefWidth="214.0" GridPane.columnIndex="1"/>
+                        <Label prefHeight="18.0" prefWidth="77.0" text="Password" GridPane.rowIndex="1"/>
+                        <TextField fx:id="txtPwd" prefHeight="26.0" prefWidth="175.0" GridPane.columnIndex="1"
+                                   GridPane.rowIndex="1"/>
+                    </GridPane>
+                    <!--                    <TextFlow fx:id="paneToken" layoutX="11.2" layoutY="353.0"   visible="false" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="10.0"  >-->
+                    <HBox fx:id="paneToken" alignment="BOTTOM_LEFT" spacing="8.0" prefHeight="70"
+                          AnchorPane.leftAnchor="10.0" AnchorPane.bottomAnchor="0" AnchorPane.rightAnchor="10" >
+                        <Label text="Token" prefHeight="70" prefWidth="60" minWidth="60"/>
+                        <TextArea fx:id="txtToken" prefHeight="80.0" wrapText="true" AnchorPane.bottomAnchor="0" text="{{token}}"/>
+                    </HBox>
+                    <!--                    </TextFlow>-->
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="364.0" prefWidth="272.0">
+                    <Label layoutX="19.0" layoutY="39.0" text="Response" AnchorPane.leftAnchor="10.0"
+                           AnchorPane.topAnchor="0.0"/>
+                    <TextArea fx:id="taResponse" editable="false" layoutX="10" layoutY="55.0" wrapText="true"
+                              AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10"
+                              AnchorPane.topAnchor="20.0"/>
+                </AnchorPane>
+            </SplitPane>
+            <Button fx:id="btnSend" layoutX="659.6" layoutY="5.0" mnemonicParsing="false" onAction="#RunRequest"
+                    prefHeight="30.0" prefWidth="60.0" style="-fx-background-color: #3399FF;-fx-text-fill: white;"
+                    styleClass="custom-button" text="Send" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0"/>
+            <ComboBox fx:id="cmbMethod" layoutX="10.4" layoutY="5.0" prefHeight="30.0" prefWidth="120.0"
+                      AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="5.0"/>
+            <!--            <TextField fx:id="txtUrl" layoutX="129.0" layoutY="10.0" prefHeight="30.0" prefWidth="410.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="60.0" AnchorPane.topAnchor="5.0" />-->
+            <ExpandableColoredTextField fx:id="customUrl" layoutX="129.0" layoutY="10.0" prefHeight="30.0"
+                                        prefWidth="410.0" AnchorPane.leftAnchor="120.0" AnchorPane.rightAnchor="60.0"
+                                        AnchorPane.topAnchor="5.0"/>
+
+            <!--<InlineCssTextArea text="Hello {{world}}!" fx:id="taInline"/>-->
+
+        </AnchorPane>
+        </VBox>
+    </content>
+    <ButtonType fx:constant="CLOSE"/>
+</DialogPane>

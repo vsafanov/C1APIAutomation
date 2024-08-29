@@ -8,24 +8,24 @@ import javafx.scene.image.ImageView;
 import oracle.com.c1apiautomation.controllers.ApiRequestController;
 import oracle.com.c1apiautomation.controllers.EditMode;
 import oracle.com.c1apiautomation.controllers.FormController;
+import oracle.com.c1apiautomation.controllers.TestRunController;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
-
-
 import java.io.IOException;
-
 
 public class ContextMenuFactory {
 
     private TreeTableView<Object> treeTableView;
     private final Environment selectedEnvironment;
+    private final Vars runtimeVars;
     ContextMenu contextMenu;
     private Object clipboardContent;
     private TreeItem<Object> clipboardTreeItem;
 
-    public ContextMenuFactory(TreeTableView<Object> treeTableView, Environment selectedEnvironment) {
+    public ContextMenuFactory(TreeTableView<Object> treeTableView, Environment selectedEnvironment, Vars runtimeVars) {
         this.treeTableView = treeTableView;
         this.selectedEnvironment = selectedEnvironment;
+        this.runtimeVars = runtimeVars;
         contextMenu = new ContextMenu();
     }
 
@@ -33,6 +33,8 @@ public class ContextMenuFactory {
 
         treeTableView.setOnContextMenuRequested(event ->
                 {
+                    //TODO: Create class to store all images as constants
+
                     contextMenu.getItems().clear();
                     var selectedItem = ((TreeTableView<?>) event.getSource()).getSelectionModel().getSelectedItem();
                     if (selectedItem != null) {
@@ -79,6 +81,7 @@ public class ContextMenuFactory {
                                     createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
                                 }
                                 createMenuItem("Run Request", e -> RunRequest(e), "runrequest5.png");
+                                createMenuItem("Run Test", e -> RunTest(e), "run2.png");
                             }
                             case null, default -> contextMenu.getItems().add(new MenuItem("Non Existing Type"));
                         }
@@ -89,6 +92,27 @@ public class ContextMenuFactory {
         );
         //init menu for first load, otherwise it's somehow not showing first time
         createInitContextMenu();
+    }
+
+    private void RunTest(ActionEvent event) {
+        if (selectedEnvironment == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setHeaderText("");
+            alert.setContentText("Please select the Environment you want to run");
+            alert.showAndWait();
+            return;
+        }
+        var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
+        var mi = ((MenuItem) event.getTarget()).getParentPopup();
+        Scene scene = mi.getScene();
+
+        var testRunController = new TestRunController(scene, selectedEnvironment, runtimeVars);
+        var testCase = (TestCase) selectedItem.getValue();
+        try {
+            testRunController.OpenRequestDialog(testCase);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void RunRequest(ActionEvent event) {
@@ -107,7 +131,7 @@ public class ContextMenuFactory {
         Scene scene = mi.getScene();
 
 
-        var apiRequestController = new ApiRequestController(scene, selectedEnvironment);
+        var apiRequestController = new ApiRequestController(scene, selectedEnvironment, runtimeVars);
         try {
             var testCase = (TestCase) selectedItem.getValue();
             apiRequestController.OpenRequestDialog(testCase);

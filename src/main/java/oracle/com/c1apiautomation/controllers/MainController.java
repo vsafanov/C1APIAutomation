@@ -7,13 +7,16 @@ import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import oracle.com.c1apiautomation.MainApplication;
@@ -36,11 +39,11 @@ public class MainController {
     public Label lblEnv;
     Root rootData;
     Environment selectedEnvironment;
-
+    private String rootFolder = "C:\\Users\\VSAFANOV\\Documents\\My Super Deals Private Folder\\Sandbox\\JavaFX";
+    private Vars runtimeVars = new Vars();
 
     public void initialize() throws IOException {
         handleLoadFromJson();
-
     }
 
     private String getSelectedEnvironment() {
@@ -75,6 +78,12 @@ public class MainController {
 
     }
 
+    private void addContextMenu()
+    {
+        var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment, runtimeVars);
+        contextMenu.CreateContextMenu();
+    }
+
     private void createEnvironmentMenus() {
         var envMenu = menuBar.getMenus().getLast().getItems();
         var selectedText = getSelectedEnvironment();
@@ -84,8 +93,7 @@ public class MainController {
         lblEnv.getStyleClass().add("label-env-inactive");
         for (Environment env : rootData.getEnvironments()) {
             RadioMenuItem mi = new RadioMenuItem(env.getName());
-            if(mi.getText().equals(selectedText))
-            {
+            if (mi.getText().equals(selectedText)) {
                 mi.setSelected(true);
             }
             mi.setToggleGroup(toggleGroup);
@@ -96,14 +104,12 @@ public class MainController {
                 lblEnv.setText(env.getName());
 
                 //Has to recreate ContextMenu after environment changed
-                var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment);
-                contextMenu.CreateContextMenu();
+               addContextMenu();
             });
             envMenu.add(mi);
         }
         var newSelectedText = getSelectedEnvironment();
-        if(newSelectedText.isEmpty())
-        {
+        if (newSelectedText.isEmpty()) {
             lblEnv.getStyleClass().add("label-env-inactive");
             lblEnv.getStyleClass().removeAll("label-env-active");
             lblEnv.setText("No Environment.");
@@ -112,7 +118,7 @@ public class MainController {
         SeparatorMenuItem smi = new SeparatorMenuItem();
         envMenu.add(smi);
 
-        MenuItem config = new MenuItem("Configure",ImageFactory.getImageView("configure1.png"));
+        MenuItem config = new MenuItem("Configure", ImageFactory.getImageView("configure1.png"));
         config.setOnAction(this::ConfigureEnvironment);
         envMenu.add(config);
     }
@@ -134,7 +140,6 @@ public class MainController {
 
     public void UpdateEnvMenu() {
         System.out.println(rootData.getEnvironments().size());
-//        menuBar.getMenus().getLast().getItems().stream().filter(s-> s instanceof RadioMenuItem).map(s-> ((RadioMenuItem) s)).forEach(radioMenuItem -> radioMenuItem.setSelected(false));
         createEnvironmentMenus();
     }
 
@@ -186,9 +191,9 @@ public class MainController {
         requestTypeColumn.setCellFactory(column -> new RequestTypeTreeTableCell());
 
         var requestServiceUrlColumn = Util.createStringColumn("Service Url", BaseTestCase.class, BaseTestCase::getServiceUrl, 150);
-        var authColumn = Util.createStringColumn("Auth Type", BaseTestCase.class, BaseTestCase::getUseAuthentication, 100);
+        var authColumn = Util.createStringColumn("Auth", BaseTestCase.class, BaseTestCase::getUseAuthentication, 50);
         var requestRequestParamsColumn = Util.createStringColumn("Payload", BaseTestCase.class, BaseTestCase::getPayload, 150);
-        var expectedResponseCodeColumn = Util.createStringColumn("Response Code", BaseTestCase.class, BaseTestCase::getExpectedResponseCode, 100);
+        var expectedResponseCodeColumn = Util.createStringColumn("Status Code", BaseTestCase.class, BaseTestCase::getExpectedResponseCode, 75);
         var expectedResponseColumn = Util.createStringColumn("Expected Response", BaseTestCase.class, BaseTestCase::getExpectedResponse, 150);
 
         var inputColumn = Util.createStringColumn("Input Vars", BaseTestCase.class, BaseTestCase::getInput, 100);
@@ -196,8 +201,8 @@ public class MainController {
 //        var passwordColumn = Utils.createStringColumn("Password", BaseTestCase.class, BaseTestCase::getPassword, 100);
 
         ttvContainer.getColumns().addAll(checkBoxColumn, microserviceColumn, moduleColumn, imageColumn, idColumn,
-                titleColumn, descriptionColumn, requestTypeColumn, requestServiceUrlColumn,authColumn,
-                requestRequestParamsColumn, expectedResponseCodeColumn, expectedResponseColumn,inputColumn);
+                titleColumn, descriptionColumn, requestTypeColumn, requestServiceUrlColumn, authColumn,
+                requestRequestParamsColumn, expectedResponseCodeColumn, expectedResponseColumn, inputColumn);
 
         //disable s sorting
         for (var column : ttvContainer.getColumns()) {
@@ -212,19 +217,22 @@ public class MainController {
         });
 
         // Add double-click event handler
-//        ttvContainer.setOnMouseClicked(event -> {
-//            if (event.getClickCount() == 2) {
-//                var selectedItem = (TreeItem<Object>) ttvContainer.getSelectionModel().getSelectedItem();
-//                if (selectedItem != null && selectedItem.getValue() instanceof BaseTestCase) {
-//                    BaseTestCase baseTestCase = (BaseTestCase) selectedItem.getValue();
-//                    try {
+        ttvContainer.setOnMouseClicked(event -> {
+            var scene =((Node)event.getSource()).getScene();
+            if (event.getClickCount() == 2) {
+                var selectedItem = (TreeItem) ttvContainer.getSelectionModel().getSelectedItem();
+                if (selectedItem != null && selectedItem.getValue() instanceof BaseTestCase baseTestCase) {
+                    try {
+                        var editMode = baseTestCase instanceof PreReq? EditMode.EDIT_PREREQ:EditMode.EDIT_TESTCASE;
 //                        handleDoubleClick(baseTestCase, selectedItem);
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
-//            }
-//        });
+                        var formController = new FormController(scene);
+                        formController.EditBaseTest(baseTestCase, ttvContainer, selectedItem, editMode);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
 
         // Populate TreeTableView with data
         TreeItem<Object> rootItem = new TreeItem<>(rootData);
@@ -258,8 +266,7 @@ public class MainController {
         ttvContainer.setEditable(true);
 
         //add context menu
-        var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment);
-        contextMenu.CreateContextMenu();
+        addContextMenu();
 
         ttvContainer.setTableMenuButtonVisible(true);
 
@@ -278,16 +285,17 @@ public class MainController {
         }
     }
 
-    @FXML
+    @FXML //! must keep it @FXML
     private void handleLoadFromJson() throws IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
         fileChooser.setTitle("Select Jason API Test Project");
-        fileChooser.setInitialDirectory(new File("C:\\Users\\VSAFANOV\\Documents\\My Super Deals Private Folder\\Sandbox\\JavaFX"));
+        fileChooser.setInitialDirectory(new File(rootFolder));
         File file = fileChooser.showOpenDialog(null);
 
         if (file != null) {
             LoadTreeTableView(file.getPath());
+            menuBar.getMenus().getLast().getItems().clear();
             createEnvironmentMenus();
         }
     }
@@ -330,22 +338,23 @@ public class MainController {
 //    }
 //    @FXML
     private void handleDoubleClick(BaseTestCase baseTestCase, TreeItem<Object> selectedItem) throws IOException {
+
         // Handle the double-click event on a BaseTestCase item
-        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("form-view.fxml"));
-
-        Parent parent = fxmlLoader.load();
-
-        Stage stage = new Stage();
-        Scene scene = new Scene(parent);
-
-        stage.setTitle("Edit Form");
-        scene.getStylesheets().add("/app.css");
-        stage.setScene(scene);
-
-        // Get the controller and set the BaseTestCase data
-        FormController controller = fxmlLoader.getController();
-//        controller.setBaseTestCase(baseTestCase, ttvContainer, selectedItem, stage);
-        stage.show();
+//        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("form-view.fxml"));
+//
+//        Parent parent = fxmlLoader.load();
+//
+//        Stage stage = new Stage();
+//        Scene scene = new Scene(parent);
+//
+//        stage.setTitle("Edit Form");
+//        scene.getStylesheets().add("/app.css");
+//        stage.setScene(scene);
+//
+//        // Get the controller and set the BaseTestCase data
+//        FormController controller = fxmlLoader.getController();
+////        controller.setBaseTestCase(baseTestCase, ttvContainer, selectedItem, stage);
+//        stage.show();
 
 
 //ttvContainer.refresh();
@@ -372,16 +381,45 @@ public class MainController {
         }
     }
 
-    public void handleSaveToFromJson(ActionEvent actionEvent) throws JsonProcessingException {
-//        ObjectMapper mapper = new ObjectMapper();
-        ObjectMapper mapper = JsonConfig.createObjectMapper();
-        var json = mapper.writeValueAsString(rootData);
-            File file = new File("output.json");
-        try (FileWriter writer = new FileWriter(file)) {
-            writer.write(json);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void handleSaveToJson(ActionEvent actionEvent) throws JsonProcessingException {
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose Save Location and Filename");
+        FileChooser.ExtensionFilter jsonFilter = new FileChooser.ExtensionFilter("JSON Files (*.json)", "*.json");
+        fileChooser.getExtensionFilters().add(jsonFilter);
+        fileChooser.setInitialFileName("ApiTest.json"); // Set default filename
+        fileChooser.setInitialDirectory(new File(rootFolder));
+
+        File selectedFile = fileChooser.showSaveDialog(null);
+
+        if (selectedFile != null) {
+            String filename = selectedFile.getName();
+            if (!filename.endsWith(".json")) {
+                selectedFile = new File(selectedFile.getParent(), filename +  ".json"); // Update selectedFile
+            }
+            try {
+                ObjectMapper mapper = JsonConfig.createObjectMapper();
+                var json = mapper.writeValueAsString(rootData);
+
+                FileWriter writer = new FileWriter(selectedFile);
+                writer.write(json);
+                writer.close();
+
+                System.out.println("JSON data saved successfully to " + selectedFile.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Error saving JSON data: " + e.getMessage());
+            }
         }
+
+//        ObjectMapper mapper = JsonConfig.createObjectMapper();
+//        var json = mapper.writeValueAsString(rootData);
+//            File file = new File("output.json");
+//        try (FileWriter writer = new FileWriter(file)) {
+//            writer.write(json);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 //        System.out.println(json);
     }
 

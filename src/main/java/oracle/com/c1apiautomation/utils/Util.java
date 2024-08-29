@@ -5,16 +5,21 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 //import javafx.scene.control.cell.CheckBoxTreeTableCell;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.util.Callback;
 import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.model.Root;
+import oracle.com.c1apiautomation.uihelpers.ColoredComboBoxCellFactory;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Util {
@@ -25,15 +30,20 @@ public class Util {
         });
     }
 
-    public static void formatJson(TextInputControl input) {
+//    public static void formatJson(TextInputControl input) {
+//
+//        input.setText(formatJson(input.getText()));
+//    }
+
+    public static String formatJson(String input) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
 
-            var json = writer.writeValueAsString(mapper.readValue(input.getText(), Object.class));
-            input.setText(json);
+            return writer.writeValueAsString(mapper.readValue(input, Object.class));
         } catch (JsonProcessingException e) {
             System.out.println(e.getMessage());
+            return input;
         }
     }
 
@@ -80,12 +90,20 @@ public class Util {
                     setText(null);
                     setTooltip(null);
                 } else {
+
                     setText(item);
+
+                    if (this.getTableColumn().getText() != null && !this.getTableColumn().getText().isEmpty()) {
+                        if (this.getTableColumn().getText().equalsIgnoreCase("payload")
+                                || this.getTableColumn().getText().equalsIgnoreCase("expected response")
+                                || this.getTableColumn().getText().equalsIgnoreCase("input vars")
+                        ) {
+                            item = Util.formatJson(item);
+                        }
+                    }
                     Tooltip tooltip = new Tooltip(item);
                     tooltip.setMaxWidth(250);
                     tooltip.setWrapText(true);
-//                    tooltip.setFont(Font.font(tooltip.getFont().getFamily(), 12));
-//                    tooltip.setTextOverrun(OverrunStyle.CLIP);
                     setTooltip(tooltip);
                 }
             }
@@ -93,6 +111,35 @@ public class Util {
         return column;
     }
 
+    public static void loadCmbMethod(ComboBox comboBox)
+    {
+        //create colored combo box for cmbMethod
+        HashMap<String, Color> colorMap = new HashMap<>();
+        colorMap.put("GET", Color.DARKGREEN);
+        colorMap.put("POST", Color.DARKORCHID);
+        colorMap.put("PUT", Color.ORANGE);
+        colorMap.put("PATCH", Color.PURPLE);
+        colorMap.put("DELETE", Color.CORAL);
+        comboBox.setItems(FXCollections.observableArrayList(colorMap.keySet()));
+
+        comboBox.setCellFactory(new ColoredComboBoxCellFactory<>(colorMap, true));
+        comboBox.setButtonCell(new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    Text text = new Text(item);
+                    Color color = colorMap.getOrDefault(item, Color.BLACK);
+                    text.setFill(color);
+                    text.setStyle("-fx-font-weight: bold");
+                    setGraphic(text);
+                }
+            }
+        });
+    }
 //    public static <T> TreeTableColumn<Object, Boolean> createBooleanColumn(String header, Class<T> type, Callback<T, Boolean> propertyGetter) {
 //        TreeTableColumn<Object, Boolean> column = new TreeTableColumn<>(header);
 //        column.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(column));

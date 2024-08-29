@@ -294,9 +294,19 @@ public class EnvironmentController {
             if (selectedEnvironment != null) {
                 Environment copiedEnv = new Environment();
                 copiedEnv.setName(name);
-                copiedEnv.setVars(selectedEnvironment.getVars());
+
+                // Deep copy the Vars object
+                Vars copiedVars = new Vars();
+                for (Map.Entry<String, String> entry : selectedEnvironment.getVars().getProperties().entrySet()) {
+                    copiedVars.setProperty(entry.getKey(), entry.getValue());
+                }
+                copiedEnv.setVars(copiedVars);
+
+                // Add the copied environment to the list
                 environments.add(copiedEnv);
                 selectedEnvironment = copiedEnv;
+
+                // Update the combo box
                 cmbEnv.getItems().add(copiedEnv.getName());
                 cmbEnv.setValue(copiedEnv.getName());
             }

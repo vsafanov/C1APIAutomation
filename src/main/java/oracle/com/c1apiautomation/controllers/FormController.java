@@ -1,15 +1,11 @@
 package oracle.com.c1apiautomation.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.ContextMenuEvent;
 import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.uihelpers.CustomInputContextMenu;
 import oracle.com.c1apiautomation.uihelpers.ImageFactory;
@@ -40,7 +36,7 @@ public class FormController {
     public CheckBox chkSelected;
     public TextField txtDescription;
     public TextField txtServiceUrl;
-    public TextField txtHeader;
+    public TextField txtContentType;
     public TextField txtPassword;
     public ComboBox<String> cmbRequestType;
     public CheckBox chkSkipValidation;
@@ -62,12 +58,9 @@ public class FormController {
     // msform-view
     public TextField txtMs;
     public TextField txtModule;
+    public TextField txtRelease;
+    public TextField txtToken;
 
-
-//    private BaseTestCase testCase;
-//    private TreeTableView<Object> treeTableView;
-//    private Stage stage;
-//    private TreeItem<Object> selectedItem;
 
     //    private EditMode editMode;
     private Scene scene;
@@ -81,8 +74,14 @@ public class FormController {
 
     public void initialize() {
         if (cmbRequestType != null) {
-            var requestTypes = FXCollections.observableArrayList("POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS");
-            cmbRequestType.setItems(requestTypes);
+//            var requestTypes = FXCollections.observableArrayList("POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS");
+//            cmbRequestType.setItems(requestTypes);
+
+            Util.loadCmbMethod(cmbRequestType);
+
+            var x = Arrays.stream(ContentType.getAllValues()).map(ContentType::getValue).collect(Collectors.joining(","));
+            System.out.println("Content Types:" + x);
+
 //            var responseCodes = FXCollections.observableArrayList("200", "201", "202", "204", "400", "403", "404", "500", "NA");
 //            var responseCodes = FXCollections.observableHashMap();
 //            responseCodes.putAll(HttpStatus.getCodes());
@@ -96,31 +95,30 @@ public class FormController {
             cmbAuthType.setItems(authTypes);
 
             MenuItem mi1 = new MenuItem("Format Json", ImageFactory.getImageView("format.png"));
-            mi1.setOnAction(e -> Util.formatJson(taPayload));
-            CustomInputContextMenu.addMenuItems(taPayload,mi1);
+            mi1.setOnAction(e -> Util.formatJson(taPayload.getText()));
+            CustomInputContextMenu.addMenuItems(taPayload, mi1);
 
             MenuItem mi2 = new MenuItem("Format Json", ImageFactory.getImageView("format.png"));
-            mi2.setOnAction(e -> Util.formatJson(taExpectedRes));
-            CustomInputContextMenu.addMenuItems(taExpectedRes,mi2);
+            mi2.setOnAction(e -> Util.formatJson(taExpectedRes.getText()));
+            CustomInputContextMenu.addMenuItems(taExpectedRes, mi2);
         }
     }
 
 
-
     private void setBaseTestCase(BaseTestCase model, EditMode editMode) {
 
-        var x = Arrays.stream(ContentType.getAllValues()).map(ContentType::getValue).collect(Collectors.joining(","));
-        System.out.println(x);
+
 //        this.testCase = model;
 //        this.treeTableView = ttvContainer;
         if (editMode == EditMode.EDIT_PREREQ || editMode == EditMode.EDIT_TESTCASE) {
 //            this.selectedItem = selectedItem;
+            txtToken.setText(model.getToken());
             txtId.setText(model.getId());
             txtTitle.setText(model.getTitle());
             txtDescription.setText(model.getDescription());
             cmbRequestType.setValue(model.getRequestType());
             txtServiceUrl.setText(model.getServiceUrl());
-            txtHeader.setText(model.getHeader());
+            txtContentType.setText(model.getContentType());
 
             var code = model.getExpectedResponseCode().isEmpty() ? "" : HttpStatus.getByCode(Integer.parseInt(model.getExpectedResponseCode()));
             cmdResponseCode.setValue(code);
@@ -130,14 +128,15 @@ public class FormController {
             chkSelected.setSelected(model.isSelected());
             chkSkipValidation.setSelected(model.isSkipValidation());
             taPreReqSql.setText(model.getPreReqSql());
-            taPayload.setText(model.getPayload());
-            Util.formatJson(taPayload);
-            taExpectedRes.setText(model.getExpectedResponse());
-            Util.formatJson(taExpectedRes);
+            taPayload.setText(Util.formatJson(model.getPayload()));
+//            Util.formatJson(taPayload);
+            taExpectedRes.setText(Util.formatJson(model.getExpectedResponse()));
+//            Util.formatJson(taExpectedRes);
             taInput.setText(model.getInput());
             taDbQuery.setText(model.getDbQuery());
             taExpectedDBRes.setText(model.getExpectedDBResult());
             taTearDownSql.setText(model.getTearDownSql());
+            txtRelease.setText(model.getRelease());
         }
     }
 
@@ -149,7 +148,7 @@ public class FormController {
                 model = new PreReq();
             }
         }
-
+        model.setToken(txtToken.getText());
         model.setId(txtId.getText());
         model.setTitle(txtTitle.getText());
         model.setDescription(txtDescription.getText());
@@ -169,6 +168,7 @@ public class FormController {
         model.setDbQuery(taDbQuery.getText());
         model.setExpectedDBResult(taExpectedDBRes.getText());
         model.setTearDownSql(taExpectedRes.getText());
+        model.setRelease(txtRelease.getText());
 
     }
 
