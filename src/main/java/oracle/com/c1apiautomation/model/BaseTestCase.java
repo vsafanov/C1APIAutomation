@@ -3,6 +3,8 @@ package oracle.com.c1apiautomation.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.lang.reflect.Field;
+
 public abstract class BaseTestCase extends SelectableBase {
     //    private final BooleanProperty selected  = new SimpleBooleanProperty();
     private String id;
@@ -28,7 +30,6 @@ public abstract class BaseTestCase extends SelectableBase {
     private String token = "{{token}}"; //set the default value, just for runtime, not being stored in json
 
     public BaseTestCase() {
-
     }
 
 //    public BaseTestCase(String type) {
@@ -211,6 +212,29 @@ public abstract class BaseTestCase extends SelectableBase {
     public BaseTestCase clone() {
         // TODO: copy mutable state here, so the clone can't change the internals of the original
         return (BaseTestCase) super.clone();
+    }
+
+    public boolean contains(String searchString) {
+        if (searchString == null || searchString.isEmpty()) {
+            return false;
+        }
+
+        searchString = searchString.toLowerCase();
+
+        for (Field field : this.getClass().getDeclaredFields()) {
+            if (field.getType().equals(String.class)) {
+                field.setAccessible(true); // To access private fields
+                try {
+                    String value = (String) field.get(this);
+                    if (value != null && value.toLowerCase().contains(searchString)) {
+                        return true;
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return false;
     }
 
 

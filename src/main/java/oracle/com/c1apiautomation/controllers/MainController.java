@@ -37,10 +37,11 @@ public class MainController {
     public MenuItem miLoadJson;
     public VBox root;
     public Label lblEnv;
+    public TextField txtSearch;
     Root rootData;
     Environment selectedEnvironment;
     private String rootFolder = "C:\\Users\\VSAFANOV\\Documents\\My Super Deals Private Folder\\Sandbox\\JavaFX";
-    private Vars runtimeVars = new Vars();
+    private Vars runtimeVars = MainApplication.getVars();
 
     public void initialize() throws IOException {
         handleLoadFromJson();
@@ -80,7 +81,7 @@ public class MainController {
 
     private void addContextMenu()
     {
-        var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment, runtimeVars);
+        var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment);
         contextMenu.CreateContextMenu();
     }
 
@@ -158,7 +159,7 @@ public class MainController {
 
         // Load data
         rootData = Util.readJson(filePath);
-
+//rootData.getMicroservices().stream().map(f->f.getModules().stream().map(t->t.getPreReqs()))
         // Add a column for checkboxes
         TreeTableColumn<Object, Boolean> checkBoxColumn = new TreeTableColumn<>("Run Test");
         checkBoxColumn.setPrefWidth(85);
@@ -421,6 +422,38 @@ public class MainController {
 //            throw new RuntimeException(e);
 //        }
 //        System.out.println(json);
+    }
+
+    private boolean filterTree(TreeItem<String> root, String searchTerm) {
+        if (searchTerm == null || searchTerm.isEmpty()) {
+            // Show all nodes and expand everything if search term is empty
+            for (TreeItem<String> child : root.getChildren()) {
+//                child.setVisible(true);  NOT WORKING!
+                filterTree(child, searchTerm);
+            }
+            return true;
+        }
+
+        boolean found = false;
+
+        // Recursively filter children
+        for (TreeItem<String> child : root.getChildren()) {
+            boolean childFound = filterTree(child, searchTerm);
+            found |= childFound; // Aggregate result to see if this branch should be visible
+        }
+
+        // Check if the current node matches the search term
+        boolean matches = root.getValue().toLowerCase().contains(searchTerm.toLowerCase());
+
+        // Set visibility: visible if it matches or any child matches
+//        root.getParent().getChildren().removeIf(item -> !matches && !found);
+
+        return matches || found;
+    }
+
+
+    public void searchText(ActionEvent actionEvent) {
+
     }
 
 

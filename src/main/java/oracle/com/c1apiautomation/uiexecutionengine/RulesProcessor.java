@@ -3,6 +3,7 @@ package oracle.com.c1apiautomation.uiexecutionengine;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import oracle.com.c1apiautomation.apifactory.HttpStatus;
 import oracle.com.c1apiautomation.model.BaseTestCase;
 import oracle.com.c1apiautomation.model.Vars;
@@ -40,7 +41,7 @@ public class RulesProcessor {
         this.runtimeVars = runtimeVars;
     }
 
-    public TestResponse Run(BaseTestCase baseTestCase, TestResponse testResponse, HttpResponse<String> response) throws JsonProcessingException {
+    public TestResponse Run(BaseTestCase baseTestCase, TestResponse testResponse, HttpResponse<String> response) throws Exception {
 //        var testResponse = new TestResponse();
         testResponse.setExpectedCode(baseTestCase.getExpectedResponseCode());
         testResponse.setExpectedResponse(baseTestCase.getExpectedResponse());
@@ -52,10 +53,10 @@ public class RulesProcessor {
         testResponse.setCodePassed(testResponse.getExpectedCode().equals(testResponse.getReturnedCode()));
 
         var returnedBody = response != null ? response.body() : null;
-        if (returnedBody != null) {
-            returnedBody = Util.replaceVarPlaceholder(returnedBody, runtimeVars.getProperties());
-            returnedBody = Util.replaceVarPlaceholder(returnedBody, globalVars.getProperties());
-        }
+//        if (returnedBody != null) {
+//            returnedBody = Util.replaceVarPlaceholder(returnedBody, runtimeVars.getProperties());
+//            returnedBody = Util.replaceVarPlaceholder(returnedBody, globalVars.getProperties());
+//        }
         testResponse.setReturnedResponseBody(returnedBody);
 
         var expectedResponse = baseTestCase.getExpectedResponse();
@@ -66,12 +67,25 @@ public class RulesProcessor {
         testResponse.setExpectedResponse(expectedResponse);
 
         //Compare response body with expectedResponse
-        if (isValidJson(testResponse.getExpectedResponse()) && isValidJson(testResponse.getReturnedResponseBody())) {
-            testResponse.setResponsePassed(compareJsons(testResponse.getExpectedResponse(), testResponse.getReturnedResponseBody()));
+        if (expectedResponse == null || expectedResponse.isEmpty()) {
+            testResponse.setResponsePassed(true);
+        } else if (returnedBody == null && !testResponse.getExpectedResponse().isEmpty()) {
+            testResponse.setResponsePassed(false);
+
+        } else if (isValidJson(testResponse.getExpectedResponse()) && isValidJson(testResponse.getReturnedResponseBody())) {
+            testResponse.setResponsePassed(compareJsonIgnoringFields(testResponse.getReturnedResponseBody(),testResponse.getExpectedResponse()));
         } else {
             testResponse.setResponsePassed(testResponse.getExpectedResponse().equals(testResponse.getReturnedResponseBody()));
         }
 
+        populateRuntimeVars(returnedBody, baseTestCase.getInput());
+        testResponse.setRuntimeVars(runtimeVars);
+
+        if (testResponse.getCodePassed() && testResponse.getResponsePassed()) {
+            testResponse.setTestPassed(true);
+        }
+
+//        testResponse.getExecutionTime();
         //Handle Input fields to create variables if needed
 
 
@@ -113,37 +127,81 @@ public class RulesProcessor {
         }
     }
 
-    public Boolean compareJsons(String json1, String json2) throws JsonProcessingException {
-//        String json1 = "{\"name\":\"Alice\", \"age\":30, \"date\":\"2023-01-01\", \"ignore\":\"true\"}";
-//        String json2 = "{\"name\":\"Alice\", \"age\":30, \"date\":\"2024-01-01\", \"ignore\":\"true\"}";
-
-
-        JsonNode tree1 = objectMapper.readTree(json1);
-        JsonNode tree2 = objectMapper.readTree(json2);
-
-        // Remove properties with the value "ignore" from both JSON nodes
-        removePropertiesWithValue(tree1, "ignore");
-        removePropertiesWithValue(tree2, "ignore");
-
-        // Use JsonNode.equals() for comparison
-        boolean areEqual = tree1.equals(tree2);
-        System.out.println("Are the JSONs equal (ignoring properties with value \"ignore\")? " + areEqual);
-        return areEqual;
-    }
-
-    private static void removePropertiesWithValue(JsonNode node, String value) {
-        for (Iterator<Map.Entry<String, JsonNode>> it = node.fields(); it.hasNext(); ) {
-            Map.Entry<String, JsonNode> entry = it.next();
-            if (entry.getValue().textValue().equals(value)) {
-                it.remove();
-            } else if (entry.getValue().isObject()) {
-                removePropertiesWithValue(entry.getValue(), value);
+    /**
+     * Compares two JSON strings while ignoring certain fields specified in the second JSON.
+     *
+     * @param returnedResponse the actual response received after executing an API call
+     * @param expectedResponse the expected response according to the test case definition, this one may have values to 'ignore'
+     * @return true if the responses match considering ignored fields, otherwise false
+     */
+    public static boolean compareJsonIgnoringFields(String returnedResponse, String expectedResponse) {
+        try {
+            // Check if either string is empty
+            if (expectedResponse == null || expectedResponse.isEmpty()) {
+                return returnedResponse == null || returnedResponse.isEmpty();
             }
+            if (returnedResponse == null || returnedResponse.isEmpty()) {
+                return false;
+            }
+
+            // Parse the strings into JsonNode
+            JsonNode json1 = objectMapper.readTree(returnedResponse);
+            JsonNode json2 = objectMapper.readTree(expectedResponse);
+
+            // If both strings are valid JSON, compare them with the ignore logic
+            return compareJsonIgnoringFields(json1, json2);
+
+        } catch (JsonProcessingException e) {
+            // If parsing fails, return false
+            return false;
         }
     }
 
-    public void populateRuntimeVars(String body, String inputJson) throws Exception {
-        if (inputJson.isEmpty()){ //|| body.isEmpty()) {
+    private static boolean compareJsonIgnoringFields(JsonNode json1, JsonNode json2) {
+        // Ensure both JSON nodes are objects
+        if (json1.isObject() && json2.isObject()) {
+            for (Iterator<Map.Entry<String, JsonNode>> fields = json1.fields(); fields.hasNext(); ) {
+                Map.Entry<String, JsonNode> entry = fields.next();
+                String key = entry.getKey();
+                JsonNode value1 = entry.getValue();
+                JsonNode value2 = json2.get(key);
+
+                // If json2 has the value "ignore" for this key, skip the comparison for this key
+                if (value2 != null && value2.isTextual() && "ignore".equals(value2.asText())) {
+                    continue;
+                }
+
+                // Recursively compare nested objects
+                if (value1.isObject() && value2 != null && value2.isObject()) {
+                    if (!compareJsonIgnoringFields(value1, value2)) {
+                        return false;
+                    }
+                } else if (!value1.equals(value2)) {
+                    return false;
+                }
+            }
+
+            // Check if json2 has extra fields that json1 doesn't have
+            for (Iterator<String> json2Fields = json2.fieldNames(); json2Fields.hasNext(); ) {
+                String key = json2Fields.next();
+                if (!json1.has(key) && !(json2.get(key).isTextual() && "ignore".equals(json2.get(key).asText()))) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // If both are not objects, directly compare them
+        return json1.equals(json2);
+    }
+
+    public void populateRuntimeVars(String responseBody, String inputJson) throws Exception {
+        if (inputJson.isEmpty()) { //|| body.isEmpty()) {
+            return;
+        }
+        if (!isValidJson(inputJson)) {
+            System.out.println("Input field is not a valid  JSON ");
             return;
         }
         // Parse the input JSON to determine the source and vars
@@ -154,7 +212,7 @@ public class RulesProcessor {
         // Switch statement based on the value of "from"
         switch (source.toLowerCase()) {
             case "response":
-                JsonNode responseNode = objectMapper.readTree(body);
+                JsonNode responseNode = objectMapper.readTree(responseBody);
                 for (String key : vars) {
                     if (responseNode.has(key)) {
                         String value = responseNode.get(key).asText(null);  // null if the value is missing or null in JSON
@@ -166,8 +224,8 @@ public class RulesProcessor {
             case "body":
                 // Add logic to handle "body"
                 // e.g., parse the body JSON and extract values
-                if(vars.length > 0) {
-                    runtimeVars.getProperties().put(vars[0], body);
+                if (vars.length > 0) {
+                    runtimeVars.getProperties().put(vars[0], responseBody);
                 }
                 break;
 
@@ -190,6 +248,7 @@ public class RulesProcessor {
             case "text":
                 // Add logic to handle "text"
                 // e.g., process a plain text source and extract values
+                System.out.println("text type is not implemented yet ");
                 break;
 
             default:

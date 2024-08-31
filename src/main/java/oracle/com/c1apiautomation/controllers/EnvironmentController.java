@@ -12,6 +12,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.converter.DefaultStringConverter;
+import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.utils.Util;
 import oracle.com.c1apiautomation.uihelpers.ImageFactory;
 import oracle.com.c1apiautomation.model.Environment;
@@ -32,14 +33,18 @@ public class EnvironmentController {
     public Button btnDelete;
     public Button btnCopy;
     public Button btnRename;
+    public Label lblInfoMessage;
 
     private Scene scene;
     public MenuBar menuBarEnv;
     List<Environment> environments;
     ObservableList<PropertyItem> items;
     private Map<String, String> originalProperties;
-    private Environment selectedEnvironment;
+    private Environment selectedEnvironment; //variable selected from combobox!
     private MainController mainController;
+    private final Vars runtimeVars = MainApplication.getVars();
+    private Environment runtimeEnvironment = new Environment();
+    private final String  RUNTIME_VARS = "Runtime Variables";
 
     public EnvironmentController() {
     }
@@ -47,6 +52,7 @@ public class EnvironmentController {
     public EnvironmentController(Scene scene, List<Environment> environments) {
         this.scene = scene;
         this.environments = environments;
+        this.runtimeEnvironment.setVars(runtimeVars);
     }
 
     public void setMainController(MainController mainController) {
@@ -78,8 +84,17 @@ public class EnvironmentController {
 
         // Enable cell editing
         tblEnv.setEditable(true);
+
+        // Set the row factory to customize row height
+        tblEnv.setRowFactory(tv -> {
+            TableRow<PropertyItem> row = new TableRow<>();
+            row.setWrapText(true);
+//            row.setPrefHeight(40);  // Set the preferred height for each row
+            return row;
+        });
         colName.setCellFactory(getEditingCellFactory());
         colValue.setCellFactory(getEditingCellFactory());
+
 
 //        colName.setCellFactory(TextFieldTableCell.forTableColumn());
 //        colValue.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -103,8 +118,9 @@ public class EnvironmentController {
     private Callback<TableColumn<PropertyItem, String>, TableCell<PropertyItem, String>> getEditingCellFactory() {
         return column -> {
             TextFieldTableCell<PropertyItem, String> cell = new TextFieldTableCell<>(new DefaultStringConverter()) {
-                @Override
 
+
+                @Override
                 public void startEdit() {
                     super.startEdit();
                     TextField textField = getGraphic() instanceof TextField ? (TextField) getGraphic() : null;
@@ -112,14 +128,31 @@ public class EnvironmentController {
                     if (textField != null) {
                         // Prevent automatic selection of text
                         textField.positionCaret(textField.getText().length());
+
+                        lblInfoMessage.setText("Press Enter or TAB to save value, ESC to cancel");
+                        lblInfoMessage.setGraphic(ImageFactory.getImageView("save.png"));
+
                         // Commit the edit when the TextField loses focus
                         textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                            lblInfoMessage.setText("");
+                            lblInfoMessage.setGraphic(null);
                             if (!newValue && isEditing()) {
                                 commitEdit(textField.getText());
                             }
                         });
+
+//                        textField.setOnAction(e->{
+//                            System.out.println(e.getSource());
+//                        });
                     }
                 }
+                // NOT WORKING
+//                public void commitEdit(String newValue) {
+//                    super.commitEdit(newValue);
+//                    // Save the edited value here
+//                    PropertyItem pi = getTableView().getItems().get(getIndex());
+//                    pi.setName(newValue);
+//                }
             };
 
             // Start editing on single-click
@@ -150,19 +183,28 @@ public class EnvironmentController {
 
     public void OpenEnvironmentDialog(String name) throws IOException {
         var dlg = new Dialog();
+        // Handle the event when the "X" button is clicked
 
         dlg.setTitle("Environments");
         var fxmlLoader = Util.OpenDialog(dlg, "environment-view.fxml", scene);
         var controller = (EnvironmentController) fxmlLoader.getController();
-
+        dlg.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> {
+            controller.cancelChanges();
+        });
         controller.environments = environments;
         var env = getEnvironmentByName(name);
         controller.selectedEnvironment = env;
         controller.originalProperties = new HashMap<>(env.getVars().getProperties());
+
+        controller.runtimeEnvironment = this.runtimeEnvironment;
         //init cmbEnv with values
         if (environments != null) {
             controller.cmbEnv.getItems().clear();
             var names = environments.stream().map(Environment::getName).collect(Collectors.toList());
+            if(!runtimeVars.getProperties().isEmpty())
+            {
+                names.add(RUNTIME_VARS);
+            }
             controller.cmbEnv.setItems(FXCollections.observableArrayList(names));
             controller.cmbEnv.setValue(env.getName());
 
@@ -179,11 +221,11 @@ public class EnvironmentController {
         dlg.showAndWait();
         if (dlg.getResult() == ButtonType.OK) {
             mainController.UpdateEnvMenu();
-
         }
     }
 
     private void cancelChanges() {
+
         if (originalProperties != null && selectedEnvironment != null) {
             Vars vars = selectedEnvironment.getVars();
             vars.getProperties().clear();
@@ -193,7 +235,8 @@ public class EnvironmentController {
 
     private void loadEnvTable(String name) {
 
-        selectedEnvironment = getEnvironmentByName(name);
+        selectedEnvironment = name != null && name.equals(RUNTIME_VARS) ? runtimeEnvironment : getEnvironmentByName(name);
+        originalProperties = new HashMap<>(selectedEnvironment.getVars().getProperties());
         if (selectedEnvironment != null) {
 
             Vars vars = selectedEnvironment.getVars();
@@ -264,6 +307,7 @@ public class EnvironmentController {
         var name = ((ComboBox) actionEvent.getSource()).getValue();
         if (name == null) name = selectedEnvironment.getName();
         cmbEnv.setValue(name);
+
         loadEnvTable(name.toString());
     }
 

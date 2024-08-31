@@ -1,5 +1,6 @@
 package oracle.com.c1apiautomation.uiexecutionengine;
 
+import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.apifactory.ApiClientFactory;
 import oracle.com.c1apiautomation.apifactory.ApiService;
 import oracle.com.c1apiautomation.model.BaseTestCase;
@@ -10,23 +11,19 @@ import oracle.com.c1apiautomation.utils.Util;
 import java.net.http.HttpResponse;
 
 public class ApiExecutionEngine {
-    private Vars runtimeVars = new Vars();
-    private Vars globalVars;
+    private final Vars runtimeVars = MainApplication.getVars();
+    ;
+    private final Vars globalVars;
 
     public ApiExecutionEngine(Environment selectedEnvironment) {
         this.globalVars = selectedEnvironment.getVars();
     }
 
-    public void RunTest(BaseTestCase baseTestCase) {
+    public TestResponse RunTest(BaseTestCase baseTestCase) {
         var testResponse = new TestResponse();
-//        testResponse.setExpectedCode(baseTestCase.getExpectedResponseCode());
-//        testResponse.setExpectedResponse(baseTestCase.getExpectedResponse());
-//        testResponse.setTestCaseId(baseTestCase.getId());
-//        testResponse.setTestCaseTitle(baseTestCase.getTitle());
-//        testResponse.setSkipValidation(baseTestCase.isSkipValidation());
 
         var globalVarsProperties = globalVars.getProperties();
-        var runtimeVarsProperties = globalVars.getProperties();
+        var runtimeVarsProperties = runtimeVars.getProperties();
 
         ApiClientFactory clientFactory = new ApiClientFactory();
 
@@ -37,7 +34,7 @@ public class ApiExecutionEngine {
 
         //replace placeholder for Token
         if (baseTestCase.getUseAuthentication().equalsIgnoreCase("bearer")) {
-            var token = runtimeVars.getByKey("token", true).isEmpty() ?
+            var token = runtimeVars.getByKey("token", true) == null ?
                     globalVars.getByKey("token", true) :
                     runtimeVars.getByKey("token", true);
             System.out.println("token: " + token);
@@ -56,7 +53,8 @@ public class ApiExecutionEngine {
             System.out.println("basic user credentials: " + userName + "/" + password);
             if (userName.isEmpty() || password.isEmpty()) {
                 System.out.println("Warning: basic user credentials are empty! ");
-                return;
+                testResponse.setError("User credentials are empty for basic authentication!");
+                return testResponse;
             }
             clientFactory.setBasicAuth(userName, password);
         }
@@ -86,6 +84,8 @@ public class ApiExecutionEngine {
             RulesProcessor proc = new RulesProcessor(globalVars, runtimeVars);
             var result = proc.Run(baseTestCase, testResponse, response);
             System.out.println(result);
+
+            return result;
             //Call outside parser/business rules processor
 //            testResponse.setReturnedResponse(response != null ? response.body() : null);
 //            testResponse.setReturnedCode(String.valueOf(response != null ? response.statusCode() : null));
@@ -102,10 +102,10 @@ public class ApiExecutionEngine {
         } catch (Exception e) {
             var error = e.getMessage() == null ? e.toString() : e.getMessage();
             System.out.println(error);
+            testResponse.setError(e.getMessage());
+            return testResponse;
 //            throw new RuntimeException(e);
         }
-
     }
-
 
 }

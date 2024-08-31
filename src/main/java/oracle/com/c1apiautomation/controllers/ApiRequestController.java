@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import oracle.com.c1apiautomation.model.Vars;
+import oracle.com.c1apiautomation.uiexecutionengine.TestResponse;
 import oracle.com.c1apiautomation.utils.Util;
 import oracle.com.c1apiautomation.controls.ExpandableColoredTextField;
 import oracle.com.c1apiautomation.model.Environment;
@@ -84,7 +85,7 @@ public class ApiRequestController {
         var dlg = new Dialog();
         dlg.setResizable(true);
         dlg.setTitle("Test Case Id: " + testCase.getId());
-        var fxmlLoader = Util.OpenDialog(dlg, "apirequest-view.fxml",scene);
+        var fxmlLoader = Util.OpenDialog(dlg, "apirequest-view.fxml", scene);
         var controller = (ApiRequestController) fxmlLoader.getController();
         controller.setRequestModel(testCase);
         controller.setSelectedEnvironment(this.selectedEnvironment);
@@ -122,11 +123,12 @@ public class ApiRequestController {
 
         ApiClientFactory clientFactory = new ApiClientFactory();
 
-        var parsedUrl = Util.replaceVarPlaceholder(customUrl.getText(),selectedEnvironment.getVars().getProperties());
+        var parsedUrl = Util.replaceVarPlaceholder(customUrl.getText(), selectedEnvironment.getVars().getProperties());
 
         if (cmbAuth.getValue().equals("Bearer Auth")) {
 //            var parsedToken = Util.replaceVarPlaceholder(txtToken.getText(),selectedEnvironment.getVars().getProperties());
-            var parsedToken = Util.replaceVarPlaceholder(txtToken.getText(),runtimeVars.getProperties());
+            var parsedToken = Util.replaceVarPlaceholder(txtToken.getText(), selectedEnvironment.getVars().getProperties());
+            parsedToken = Util.replaceVarPlaceholder(txtToken.getText(), runtimeVars.getProperties());
             clientFactory.setJwtToken(parsedToken);
         }
         if (cmbAuth.getValue().equals("Basic Auth")) {
@@ -157,20 +159,24 @@ public class ApiRequestController {
             };
 
 
-            if(!input.isEmpty()) {
+            if (!input.isEmpty()) {
                 ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode inputNode = objectMapper.readTree(input);
-                String source = inputNode.get("source").asText();
-                var vars = inputNode.get("vars").asText();
-                if ("body".equalsIgnoreCase(source) && response != null) {
-                    runtimeVars.getProperties().put(vars, response.body());
+                try {
+                    JsonNode inputNode = objectMapper.readTree(input);
+                    String source = inputNode.get("source").asText();
+                    var vars = inputNode.get("vars").asText();
+                    if ("body".equalsIgnoreCase(source) && response != null) {
+                        runtimeVars.getProperties().put(vars, response.body());
+                    }
+                } catch (JsonProcessingException e) {
+                    System.out.println("Input is not json" + e.getMessage());
                 }
             }
 
-                        var header = "";
+            var header = "";
             if (response.statusCode() >= 400) {
                 taResponse.setStyle("-fx-text-fill: red");
-                header =  "\n\n" + getHeadersText(response.headers()) + "\n";
+                header = "\n\n" + getHeadersText(response.headers()) + "\n";
 
             } else {
                 taResponse.setStyle("-fx-text-fill: green");
@@ -196,26 +202,6 @@ public class ApiRequestController {
 
     }
 
-    public void addVarFromJson(String jsonString, Vars currentVars) throws JsonProcessingException {
-        // Create ObjectMapper instance
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        // Parse the JSON string into a JsonNode
-        JsonNode jsonNode = objectMapper.readTree(jsonString);
-
-        // Iterate over the fields in the JSON node
-        jsonNode.fields().forEachRemaining(field -> {
-            String key = field.getKey();
-            String value = field.getValue().asText();
-
-            // Replace the placeholder with the actual value
-            String actualValue = Util.replaceVarPlaceholder(value,currentVars.getProperties());
-//            String actualValue = value.replace("{{body}}", "my body value");
-
-            // Put the entry into the HashMap
-            currentVars.setProperty(key, actualValue);
-        });
-    }
 
     private String getHeadersText(HttpHeaders headers) {
         StringBuilder headersText = new StringBuilder();

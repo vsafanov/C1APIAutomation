@@ -5,6 +5,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.controllers.ApiRequestController;
 import oracle.com.c1apiautomation.controllers.EditMode;
 import oracle.com.c1apiautomation.controllers.FormController;
@@ -17,15 +18,15 @@ public class ContextMenuFactory {
 
     private TreeTableView<Object> treeTableView;
     private final Environment selectedEnvironment;
-    private final Vars runtimeVars;
+    private final Vars runtimeVars = MainApplication.getVars();;
     ContextMenu contextMenu;
     private Object clipboardContent;
     private TreeItem<Object> clipboardTreeItem;
 
-    public ContextMenuFactory(TreeTableView<Object> treeTableView, Environment selectedEnvironment, Vars runtimeVars) {
+    public ContextMenuFactory(TreeTableView<Object> treeTableView, Environment selectedEnvironment) {
         this.treeTableView = treeTableView;
         this.selectedEnvironment = selectedEnvironment;
-        this.runtimeVars = runtimeVars;
+//        this.runtimeVars = runtimeVars;
         contextMenu = new ContextMenu();
     }
 
@@ -106,7 +107,7 @@ public class ContextMenuFactory {
         var mi = ((MenuItem) event.getTarget()).getParentPopup();
         Scene scene = mi.getScene();
 
-        var testRunController = new TestRunController(scene, selectedEnvironment, runtimeVars);
+        var testRunController = new TestRunController(scene, selectedEnvironment);
         var testCase = (TestCase) selectedItem.getValue();
         try {
             testRunController.OpenRequestDialog(testCase);

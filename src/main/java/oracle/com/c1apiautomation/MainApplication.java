@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
+import oracle.com.c1apiautomation.model.Vars;
 import oracle.com.c1apiautomation.uihelpers.ImageFactory;
 import oracle.com.c1apiautomation.utils.UserPreferences;
 import oracle.com.c1apiautomation.utils.ExceptionHandler;
@@ -15,9 +16,16 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class MainApplication extends Application {
+
+    private static Vars vars;
+
+    public static Vars getVars() {
+        return vars;
+    }
     @Override
     public void start(Stage stage) throws IOException {
         final String ANSI_RED = "\u001B[31m";
+        vars = new Vars();  // Initialize the Vars instance
 
         // Set the global exception handler
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
