@@ -18,18 +18,20 @@
                        AnchorPane.topAnchor="50.0">
                 <columns>
                     <TableColumn fx:id="colName" prefWidth="160.0" text="Name"/>
-                    <TableColumn fx:id="colValue" prefWidth="500.0" text="Value"/>
+                    <TableColumn fx:id="colValue" prefWidth="450.0" text="Value"/>
                 </columns>
             </TableView>
             <ComboBox fx:id="cmbEnv" layoutX="89.0" layoutY="22.0" onAction="#onEnvChanged" prefWidth="180.0" AnchorPane.leftAnchor="0"
                       promptText="No Environment" style="-fx-font-weight: bold;"/>
             <Label layoutX="250.0" layoutY="22.0" fx:id="lblInfoMessage"/>
+            <AnchorPane fx:id="paneBtnContainer" AnchorPane.rightAnchor="0">
             <Button fx:id="btnRename" layoutX="518.0" layoutY="22.0" mnemonicParsing="false" onAction="#onRenameEnv"
                     AnchorPane.rightAnchor="80"/>
             <Button fx:id="btnCopy" layoutX="543.0" layoutY="22.0" mnemonicParsing="false" onAction="#onCopyEnv"
                     AnchorPane.rightAnchor="40"/>
             <Button fx:id="btnDelete" layoutX="567.0" layoutY="22.0" mnemonicParsing="false" onAction="#onDeleteEnv"
                     AnchorPane.rightAnchor="0"/>
+            </AnchorPane>
         </AnchorPane>
     </content>
     <ButtonType fx:constant="OK" />

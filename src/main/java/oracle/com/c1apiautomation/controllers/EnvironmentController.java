@@ -9,18 +9,22 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.util.Callback;
 import javafx.util.converter.DefaultStringConverter;
 import oracle.com.c1apiautomation.MainApplication;
-import oracle.com.c1apiautomation.utils.Util;
-import oracle.com.c1apiautomation.uihelpers.ImageFactory;
 import oracle.com.c1apiautomation.model.Environment;
 import oracle.com.c1apiautomation.model.PropertyItem;
 import oracle.com.c1apiautomation.model.Vars;
+import oracle.com.c1apiautomation.uihelpers.ImageFactory;
+import oracle.com.c1apiautomation.utils.Util;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EnvironmentController {
@@ -34,6 +38,7 @@ public class EnvironmentController {
     public Button btnCopy;
     public Button btnRename;
     public Label lblInfoMessage;
+    public AnchorPane paneBtnContainer;
 
     private Scene scene;
     public MenuBar menuBarEnv;
@@ -44,7 +49,7 @@ public class EnvironmentController {
     private MainController mainController;
     private final Vars runtimeVars = MainApplication.getVars();
     private Environment runtimeEnvironment = new Environment();
-    private final String  RUNTIME_VARS = "Runtime Variables";
+    private final String RUNTIME_VARS = "Runtime Variables";
 
     public EnvironmentController() {
     }
@@ -52,6 +57,7 @@ public class EnvironmentController {
     public EnvironmentController(Scene scene, List<Environment> environments) {
         this.scene = scene;
         this.environments = environments;
+        this.runtimeEnvironment.setName(RUNTIME_VARS);
         this.runtimeEnvironment.setVars(runtimeVars);
     }
 
@@ -80,18 +86,18 @@ public class EnvironmentController {
         colValue.setCellValueFactory(new PropertyValueFactory<>("value"));
 
         // Bind the second column to take the remaining width of the table
-        colValue.prefWidthProperty().bind(tblEnv.widthProperty().subtract(colName.getPrefWidth()));
+        colValue.prefWidthProperty().bind(tblEnv.widthProperty().subtract(colName.getPrefWidth()+10));
 
         // Enable cell editing
         tblEnv.setEditable(true);
 
         // Set the row factory to customize row height
-        tblEnv.setRowFactory(tv -> {
-            TableRow<PropertyItem> row = new TableRow<>();
-            row.setWrapText(true);
-//            row.setPrefHeight(40);  // Set the preferred height for each row
-            return row;
-        });
+//        tblEnv.setRowFactory(tv -> {
+//            TableRow<PropertyItem> row = new TableRow<>();
+//            row.setWrapText(true);
+////            row.setPrefHeight(40);  // Set the preferred height for each row
+//            return row;
+//        });
         colName.setCellFactory(getEditingCellFactory());
         colValue.setCellFactory(getEditingCellFactory());
 
@@ -176,9 +182,13 @@ public class EnvironmentController {
     }
 
     private Environment getEnvironmentByName(String name) {
-        return name == null ?
-                environments.getFirst() :
-                environments.stream().filter(e -> e.getName().equals(name)).findFirst().orElse(null);
+        if (name == null) {
+            return environments.getFirst();
+        }
+        if (name.equals(RUNTIME_VARS)) {
+            return runtimeEnvironment;
+        }
+        return environments.stream().filter(e -> e.getName().equals(name)).findFirst().orElse(null);
     }
 
     public void OpenEnvironmentDialog(String name) throws IOException {
@@ -201,10 +211,9 @@ public class EnvironmentController {
         if (environments != null) {
             controller.cmbEnv.getItems().clear();
             var names = environments.stream().map(Environment::getName).collect(Collectors.toList());
-            if(!runtimeVars.getProperties().isEmpty())
-            {
+//            if (!runtimeVars.getProperties().isEmpty()) {
                 names.add(RUNTIME_VARS);
-            }
+//            }
             controller.cmbEnv.setItems(FXCollections.observableArrayList(names));
             controller.cmbEnv.setValue(env.getName());
 
@@ -235,8 +244,9 @@ public class EnvironmentController {
 
     private void loadEnvTable(String name) {
 
-        selectedEnvironment = name != null && name.equals(RUNTIME_VARS) ? runtimeEnvironment : getEnvironmentByName(name);
+        selectedEnvironment = getEnvironmentByName(name);
         originalProperties = new HashMap<>(selectedEnvironment.getVars().getProperties());
+        paneBtnContainer.setVisible(!selectedEnvironment.equals(runtimeEnvironment));
         if (selectedEnvironment != null) {
 
             Vars vars = selectedEnvironment.getVars();
@@ -247,7 +257,6 @@ public class EnvironmentController {
             for (Map.Entry<String, String> entry : properties.entrySet()) {
                 items.add(new PropertyItem(entry.getKey(), entry.getValue()));
             }
-
             tblEnv.setItems(items);
         }
     }
@@ -304,7 +313,7 @@ public class EnvironmentController {
     }
 
     public void onEnvChanged(ActionEvent actionEvent) {
-        var name = ((ComboBox) actionEvent.getSource()).getValue();
+        var name = ((ComboBox<?>) actionEvent.getSource()).getValue();
         if (name == null) name = selectedEnvironment.getName();
         cmbEnv.setValue(name);
 

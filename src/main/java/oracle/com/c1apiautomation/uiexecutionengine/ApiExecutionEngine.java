@@ -102,7 +102,7 @@ public class ApiExecutionEngine {
         } catch (Exception e) {
             var error = e.getMessage() == null ? e.toString() : e.getMessage();
             System.out.println(error);
-            testResponse.setError(e.getMessage());
+            testResponse.setError(error);
             return testResponse;
 //            throw new RuntimeException(e);
         }
