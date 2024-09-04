@@ -6,12 +6,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import oracle.com.c1apiautomation.MainApplication;
-import oracle.com.c1apiautomation.controllers.ApiRequestController;
-import oracle.com.c1apiautomation.controllers.EditMode;
-import oracle.com.c1apiautomation.controllers.FormController;
-import oracle.com.c1apiautomation.controllers.TestRunController;
+import oracle.com.c1apiautomation.controllers.*;
 import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
+import oracle.com.c1apiautomation.utils.Util;
+
 import java.io.IOException;
 
 public class ContextMenuFactory {
@@ -199,6 +198,10 @@ public class ContextMenuFactory {
             }
 
             TreeItem<Object> newTreeItem = new TreeItem<>(clonedObject);
+            //add event for Microservices and Modules root checkboxes
+            if(clonedObject instanceof Module || clonedObject instanceof Microservice) {
+                Util.addCheckBoxListener((SelectableBase) clonedObject, newTreeItem);
+            }
             copyTreeItemChildren(selectedItem, newTreeItem);
             clipboardTreeItem = newTreeItem;
             clipboardContent = clonedObject;
@@ -206,6 +209,7 @@ public class ContextMenuFactory {
             System.out.println(clipboardContent);
         }
     }
+
 
     private void PasteRecord() {
         var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
@@ -277,6 +281,8 @@ public class ContextMenuFactory {
             if (childValue instanceof Microservice) {
                 Microservice clonedMicroservice = ((Microservice) childValue).clone();
                 TreeItem<Object> newChild = new TreeItem<>(clonedMicroservice);
+                //add event for Microservices checkboxes
+                Util.addCheckBoxListener(clonedMicroservice, newChild);
                 destination.getChildren().add(newChild);
                 // Recursively copy any children of the Microservice node
                 copyTreeItemChildren(child, newChild);
@@ -285,13 +291,16 @@ public class ContextMenuFactory {
             else if (childValue instanceof Module) {
                 Module clonedModule = ((Module) childValue).clone();
                 TreeItem<Object> newChild = new TreeItem<>(clonedModule);
+                //add event for Module checkboxes
+                Util.addCheckBoxListener(clonedModule, newChild);
                 destination.getChildren().add(newChild);
                 // Recursively copy any children of the Module node
                 copyTreeItemChildren(child, newChild);
             }
             // Handle other types of objects
             else {
-                TreeItem<Object> newChild = new TreeItem<>(childValue);
+                BaseTestCase clonedTestCase = ((BaseTestCase) childValue).clone();
+                TreeItem<Object> newChild = new TreeItem<>(clonedTestCase);
                 destination.getChildren().add(newChild);
                 copyTreeItemChildren(child, newChild);
             }

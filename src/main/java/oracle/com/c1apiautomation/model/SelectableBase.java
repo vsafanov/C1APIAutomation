@@ -10,7 +10,7 @@ import java.io.Closeable;
 
 public abstract class SelectableBase implements Cloneable {
 
-    private final BooleanProperty selected = new SimpleBooleanProperty();
+    private  BooleanProperty selected = new SimpleBooleanProperty();
 
     public BooleanProperty getSelected() {
         return selected;
@@ -27,8 +27,10 @@ public abstract class SelectableBase implements Cloneable {
     @Override
     public SelectableBase clone() {
         try {
-            // TODO: copy mutable state here, so the clone can't change the internals of the original
-            return (SelectableBase) super.clone();
+            SelectableBase copy = (SelectableBase) super.clone();
+            // Deep copy the BooleanProperty
+            copy.selected = new SimpleBooleanProperty(this.selected.get());//.set(this.isSelected());
+            return copy;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }

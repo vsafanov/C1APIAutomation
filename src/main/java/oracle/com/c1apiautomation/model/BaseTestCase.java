@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.lang.reflect.Field;
 
-public abstract class BaseTestCase extends SelectableBase {
+public abstract class BaseTestCase extends SelectableBase  {
     //    private final BooleanProperty selected  = new SimpleBooleanProperty();
     private String id;
     private String title;
@@ -210,8 +210,11 @@ public abstract class BaseTestCase extends SelectableBase {
 
     @Override
     public BaseTestCase clone() {
-        // TODO: copy mutable state here, so the clone can't change the internals of the original
-        return (BaseTestCase) super.clone();
+        BaseTestCase copy = (BaseTestCase) super.clone();
+        // Deep copy mutable fields here, if needed
+        copy.setSelected(this.isSelected()); // Clone the BooleanProperty value
+
+        return copy;
     }
 
     public boolean contains(String searchString) {

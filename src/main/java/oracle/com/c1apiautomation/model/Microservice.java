@@ -1,6 +1,7 @@
 package oracle.com.c1apiautomation.model;
 
 import java.io.Closeable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Microservice extends  SelectableBase {
@@ -27,7 +28,16 @@ public class Microservice extends  SelectableBase {
 
     @Override
     public Microservice clone() {
-        // TODO: copy mutable state here, so the clone can't change the internals of the original
-        return (Microservice) super.clone();
+        Microservice copy = (Microservice) super.clone();
+//        copy.setSelected(this.isSelected()); // Clone the BooleanProperty value
+//        // Deep copy the mutable fields
+//        copy.name = this.name;  // Strings are immutable, so this is safe
+//        if (this.modules != null) {
+//            copy.modules = new ArrayList<>(this.modules.size());
+//            for (Module module : this.modules) {
+//                copy.modules.add(module.clone()); // Assuming Module also implements Cloneable
+//            }
+//        }
+        return copy;
     }
 }

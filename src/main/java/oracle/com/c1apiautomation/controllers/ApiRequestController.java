@@ -10,7 +10,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import oracle.com.c1apiautomation.model.Vars;
-import oracle.com.c1apiautomation.uiexecutionengine.TestResponse;
 import oracle.com.c1apiautomation.utils.Util;
 import oracle.com.c1apiautomation.controls.ExpandableColoredTextField;
 import oracle.com.c1apiautomation.model.Environment;

@@ -1,7 +1,4 @@
-package oracle.com.c1apiautomation.uiexecutionengine;
-
-import oracle.com.c1apiautomation.model.Vars;
-
+package oracle.com.c1apiautomation.model;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -18,7 +15,7 @@ public class TestResponse {
     private Vars runtimeVars;
     private String payload;
     private Boolean skipValidation;
-    private final String executionTime =  (new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")).format(new Date());
+    private final String executionTime = (new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")).format(new Date());
     private String error;
 
     public TestResponse() {
@@ -32,16 +29,16 @@ public class TestResponse {
         return testCaseId;
     }
 
+    public void setTestCaseId(String testCaseId) {
+        this.testCaseId = testCaseId;
+    }
+
     public Boolean getSkipValidation() {
         return skipValidation;
     }
 
     public void setSkipValidation(Boolean skipValidation) {
         this.skipValidation = skipValidation;
-    }
-
-    public void setTestCaseId(String testCaseId) {
-        this.testCaseId = testCaseId;
     }
 
     public String getTestCaseTitle() {

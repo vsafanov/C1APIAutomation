@@ -29,6 +29,7 @@ import oracle.com.c1apiautomation.utils.UserPreferences;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -79,8 +80,7 @@ public class MainController {
 
     }
 
-    private void addContextMenu()
-    {
+    private void addContextMenu() {
         var contextMenu = new ContextMenuFactory(ttvContainer, selectedEnvironment);
         contextMenu.CreateContextMenu();
     }
@@ -105,7 +105,7 @@ public class MainController {
                 lblEnv.setText(env.getName());
 
                 //Has to recreate ContextMenu after environment changed
-               addContextMenu();
+                addContextMenu();
             });
             envMenu.add(mi);
         }
@@ -219,12 +219,12 @@ public class MainController {
 
         // Add double-click event handler
         ttvContainer.setOnMouseClicked(event -> {
-            var scene =((Node)event.getSource()).getScene();
+            var scene = ((Node) event.getSource()).getScene();
             if (event.getClickCount() == 2) {
                 var selectedItem = (TreeItem) ttvContainer.getSelectionModel().getSelectedItem();
                 if (selectedItem != null && selectedItem.getValue() instanceof BaseTestCase baseTestCase) {
                     try {
-                        var editMode = baseTestCase instanceof PreReq? EditMode.EDIT_PREREQ:EditMode.EDIT_TESTCASE;
+                        var editMode = baseTestCase instanceof PreReq ? EditMode.EDIT_PREREQ : EditMode.EDIT_TESTCASE;
 //                        handleDoubleClick(baseTestCase, selectedItem);
                         var formController = new FormController(scene);
                         formController.EditBaseTest(baseTestCase, ttvContainer, selectedItem, editMode);
@@ -396,7 +396,7 @@ public class MainController {
         if (selectedFile != null) {
             String filename = selectedFile.getName();
             if (!filename.endsWith(".json")) {
-                selectedFile = new File(selectedFile.getParent(), filename +  ".json"); // Update selectedFile
+                selectedFile = new File(selectedFile.getParent(), filename + ".json"); // Update selectedFile
             }
             try {
                 ObjectMapper mapper = JsonConfig.createObjectMapper();
@@ -453,7 +453,11 @@ public class MainController {
 
 
     public void searchText(ActionEvent actionEvent) {
-
+//        var d =  rootData.getMicroservices().stream().map(f -> f.getModules().stream().map(t -> t.getPreReqs().stream().filter(p -> p.contains(txtSearch.getText()))));
+        rootData.getMicroservices().remove(2);
+//        TreeItem<Object> rootItem = new TreeItem<>(d);
+//        ttvContainer.setRoot(rootItem);
+        ttvContainer.refresh();
     }
 
 

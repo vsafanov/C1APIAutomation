@@ -1,5 +1,6 @@
 package oracle.com.c1apiautomation.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Module extends SelectableBase {
@@ -36,7 +37,24 @@ public class Module extends SelectableBase {
 
     @Override
     public Module clone() {
-        // TODO: copy mutable state here, so the clone can't change the internals of the original
-        return (Module) super.clone();
+        Module copy = (Module) super.clone();
+
+        // Deep copy the preReqs list
+//        if (this.preReqs != null) {
+//            copy.preReqs = new ArrayList<>(this.preReqs.size());
+//            for (PreReq preReq : this.preReqs) {
+//                copy.preReqs.add(preReq.clone()); // Ensure PreReq implements clone
+//            }
+//        }
+//
+//        // Deep copy the testCases list
+//        if (this.testCases != null) {
+//            copy.testCases = new ArrayList<>(this.testCases.size());
+//            for (TestCase testCase : this.testCases) {
+//                copy.testCases.add(testCase.clone()); // Ensure TestCase implements clone
+//            }
+//        }
+
+        return copy;
     }
 }

@@ -16,6 +16,7 @@ import javafx.scene.text.Text;
 import javafx.util.Callback;
 import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.model.Root;
+import oracle.com.c1apiautomation.model.SelectableBase;
 import oracle.com.c1apiautomation.uihelpers.ColoredComboBoxCellFactory;
 
 import java.io.*;
@@ -29,11 +30,6 @@ public class Util {
         return objectMapper.readValue(new File(filePath), new TypeReference<Root>() {
         });
     }
-
-//    public static void formatJson(TextInputControl input) {
-//
-//        input.setText(formatJson(input.getText()));
-//    }
 
     public static String formatJson(String input) {
         try {
@@ -139,6 +135,20 @@ public class Util {
                 }
             }
         });
+    }
+
+    public static void addCheckBoxListener(SelectableBase parent, TreeItem<Object> parentItem) {
+        try {
+            parent.getSelected().addListener((obs, oldVal, newVal) -> {
+                for (TreeItem<Object> childItem : parentItem.getChildren()) {
+
+                    SelectableBase childValue = (SelectableBase) childItem.getValue();
+                    childValue.getSelected().set(newVal);
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 //    public static <T> TreeTableColumn<Object, Boolean> createBooleanColumn(String header, Class<T> type, Callback<T, Boolean> propertyGetter) {
 //        TreeTableColumn<Object, Boolean> column = new TreeTableColumn<>(header);

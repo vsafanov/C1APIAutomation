@@ -3,15 +3,13 @@ package oracle.com.c1apiautomation.uiexecutionengine;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import oracle.com.c1apiautomation.apifactory.HttpStatus;
 import oracle.com.c1apiautomation.model.BaseTestCase;
+import oracle.com.c1apiautomation.model.TestResponse;
 import oracle.com.c1apiautomation.model.Vars;
 import oracle.com.c1apiautomation.utils.Util;
 
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;

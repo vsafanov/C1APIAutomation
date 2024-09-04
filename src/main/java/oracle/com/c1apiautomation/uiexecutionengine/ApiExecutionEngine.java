@@ -5,6 +5,7 @@ import oracle.com.c1apiautomation.apifactory.ApiClientFactory;
 import oracle.com.c1apiautomation.apifactory.ApiService;
 import oracle.com.c1apiautomation.model.BaseTestCase;
 import oracle.com.c1apiautomation.model.Environment;
+import oracle.com.c1apiautomation.model.TestResponse;
 import oracle.com.c1apiautomation.model.Vars;
 import oracle.com.c1apiautomation.utils.Util;
 
@@ -12,7 +13,6 @@ import java.net.http.HttpResponse;
 
 public class ApiExecutionEngine {
     private final Vars runtimeVars = MainApplication.getVars();
-    ;
     private final Vars globalVars;
 
     public ApiExecutionEngine(Environment selectedEnvironment) {
