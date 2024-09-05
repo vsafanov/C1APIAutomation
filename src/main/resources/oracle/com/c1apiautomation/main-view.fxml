@@ -23,8 +23,8 @@
             <MenuItem fx:id="miLoadJson" onAction="#handleLoadFromJson" text="Load From JSON" />
             <MenuItem fx:id="miSaveToJson" onAction="#handleSaveToJson" text="Save To JSON"  >
                 <graphic>
-                    <ImageView>
-                        <Image url="@images/icon-save-as-16.png"/>
+                    <ImageView fx:id="imgViewSaveToJson">
+<!--                        <Image fx:id="imgSaveToJson" url="@images/icon-save-as-16.png"/>-->
                     </ImageView>
                 </graphic>
             </MenuItem>

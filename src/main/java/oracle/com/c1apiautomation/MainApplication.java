@@ -9,6 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import oracle.com.c1apiautomation.model.Vars;
 import oracle.com.c1apiautomation.uihelpers.ImageFactory;
+import oracle.com.c1apiautomation.uihelpers.ImageResource;
 import oracle.com.c1apiautomation.utils.UserPreferences;
 import oracle.com.c1apiautomation.utils.ExceptionHandler;
 
@@ -40,7 +41,7 @@ public class MainApplication extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 1400, 800);
         stage.setTitle("API Test Studio!");   //API Test Admin, APITestManager
-        stage.getIcons().add(ImageFactory.getImageView("title.png").getImage());
+        stage.getIcons().add(ImageFactory.getImageView(ImageResource.ICON_HOME).getImage());
         //Engine to run tests, possible names: API Test Runner, API Test Engine, API Test Processor
         stage.titleProperty();
         scene.getStylesheets().add("/app.css");

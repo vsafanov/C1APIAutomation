@@ -36,13 +36,13 @@ public class ImageTreeTableCell extends TreeTableCell<Object, String> {
             TreeItem<Object> treeItem = getTreeTableView().getTreeItem(getIndex());
 
             if (treeItem.getValue() instanceof PreReq) {
-                imageView.setImage(ImageFactory.getImageView("settings1.png").getImage());
+                imageView.setImage(ImageFactory.getImageView(ImageResource.ICON_PRE_REQ).getImage());
 
                 tooltip.setText("PreReq Item");
                 setTooltip(tooltip);
 
             } else if (treeItem.getValue() instanceof TestCase) {
-                imageView.setImage(ImageFactory.getImageView("test1.png").getImage());
+                imageView.setImage(ImageFactory.getImageView(ImageResource.ICON_TEST_CASE).getImage());
                 tooltip.setText("Test Item");
                 setTooltip(tooltip);
 

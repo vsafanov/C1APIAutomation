@@ -18,6 +18,7 @@ import oracle.com.c1apiautomation.model.Environment;
 import oracle.com.c1apiautomation.model.PropertyItem;
 import oracle.com.c1apiautomation.model.Vars;
 import oracle.com.c1apiautomation.uihelpers.ImageFactory;
+import oracle.com.c1apiautomation.uihelpers.ImageResource;
 import oracle.com.c1apiautomation.utils.Util;
 
 import java.io.IOException;
@@ -77,9 +78,9 @@ public class EnvironmentController {
     public void initialize() {
 
         //init buttons
-        createImageButton(btnCopy, "copygreen.png", "Copy Environment");
-        createImageButton(btnDelete, "deletegreen.png", "Delete Environment");
-        createImageButton(btnRename, "renamegreen.png", "Rename Environment");
+        createImageButton(btnCopy, ImageResource.ICON_COPY_ENV, "Copy Environment");
+        createImageButton(btnDelete, ImageResource.ICON_DELETE_ENV, "Delete Environment");
+        createImageButton(btnRename, ImageResource.ICON_RENAME_ENV, "Rename Environment");
 
         //getClass().getResource("/oracle/com/c1apiautomation/images/copy.png")  - ! option for controller use
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -111,8 +112,8 @@ public class EnvironmentController {
 
         // Context menu for adding and removing items
         ContextMenu contextMenu = new ContextMenu();
-        MenuItem addItem = new MenuItem("Add Variable", ImageFactory.getImageView("new.png"));
-        MenuItem removeItem = new MenuItem("Remove Variable", ImageFactory.getImageView("trash.png"));
+        MenuItem addItem = new MenuItem("Add Variable", ImageFactory.getImageView(ImageResource.ICON_ADD_NEW));
+        MenuItem removeItem = new MenuItem("Remove Variable", ImageFactory.getImageView(ImageResource.ICON_DELETE));
 
         addItem.setOnAction(e -> addEntry());
         removeItem.setOnAction(e -> removeEntry(tblEnv.getSelectionModel().getSelectedItem()));
@@ -136,7 +137,7 @@ public class EnvironmentController {
                         textField.positionCaret(textField.getText().length());
 
                         lblInfoMessage.setText("Press Enter or TAB to save value, ESC to cancel");
-                        lblInfoMessage.setGraphic(ImageFactory.getImageView("save.png"));
+                        lblInfoMessage.setGraphic(ImageFactory.getImageView(ImageResource.ICON_SAVE));
 
                         // Commit the edit when the TextField loses focus
                         textField.focusedProperty().addListener((observable, oldValue, newValue) -> {

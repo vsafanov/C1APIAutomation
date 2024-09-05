@@ -41,47 +41,47 @@ public class ContextMenuFactory {
 
                         switch (selectedItem.getValue()) {
                             case Microservice microservice -> {
-                                createMenuItem("Add New Microservice", e -> EditRecord(e, EditMode.ADD_MICROSERVICE), "new.png");
-                                createMenuItem("Delete Microservice", e -> DeleteRecord(), "trash.png");
-                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "new.png");
-                                createMenuItem("Copy", e -> CopyRecord(), "copy.png");
+                                createMenuItem("Add New Microservice", e -> EditRecord(e, EditMode.ADD_MICROSERVICE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("Delete Microservice", e -> DeleteRecord(), ImageResource.ICON_DELETE);
+                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && (clipboardContent instanceof Microservice || clipboardContent instanceof Module)) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
                                 }
                             }
                             case Module module -> {
-                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), "new.png");
-                                createMenuItem("Delete Module", e -> DeleteRecord(), "trash.png");
-                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "new.png");
-                                createMenuItem("Add New Test", e -> EditRecord(e, EditMode.ADD_TESTCASE), "new.png");
-                                createMenuItem("Copy", e -> CopyRecord(), "copy.png");
+                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("Delete Module", e -> DeleteRecord(), ImageResource.ICON_DELETE);
+                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("Add New Test", e -> EditRecord(e, EditMode.ADD_TESTCASE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && (clipboardContent instanceof BaseTestCase || clipboardContent instanceof Module)) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
                                 }
 
                             }
                             case PreReq preReq -> {
-                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), "new.png");
-                                createMenuItem("Edit PreReq", e -> EditRecord(e, EditMode.EDIT_PREREQ), "editcolor.png");
-                                createMenuItem("Delete PreReq", e -> DeleteRecord(), "trash.png");
+                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("Edit PreReq", e -> EditRecord(e, EditMode.EDIT_PREREQ), ImageResource.ICON_EDIT);
+                                createMenuItem("Delete PreReq", e -> DeleteRecord(), ImageResource.ICON_DELETE);
 
-                                createMenuItem("Copy", e -> CopyRecord(), "copy.png");
+                                createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && clipboardContent instanceof PreReq) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
                                 }
                             }
 
                             case TestCase testCase -> {
-                                createMenuItem("Add New Test Case", e -> EditRecord(e, EditMode.ADD_TESTCASE), "new.png");
-                                createMenuItem("Edit Test Case", e -> EditRecord(e, EditMode.EDIT_TESTCASE), "editcolor.png");
-                                createMenuItem("Delete Test Case", e -> DeleteRecord(), "trash.png");
+                                createMenuItem("Add New Test Case", e -> EditRecord(e, EditMode.ADD_TESTCASE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("Edit Test Case", e -> EditRecord(e, EditMode.EDIT_TESTCASE), ImageResource.ICON_EDIT);
+                                createMenuItem("Delete Test Case", e -> DeleteRecord(), ImageResource.ICON_DELETE);
 
-                                createMenuItem("Copy", e -> CopyRecord(), "copy.png");
+                                createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && clipboardContent instanceof TestCase) {
-                                    createMenuItem("Paste", e -> PasteRecord(), "pastecolor.png");
+                                    createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
                                 }
-                                createMenuItem("Run Request", e -> RunRequest(e), "runrequest5.png");
-                                createMenuItem("Run Test", e -> RunTest(e), "run2.png");
+                                createMenuItem("Run Request", e -> RunRequest(e), ImageResource.ICON_RUN_REQUEST);
+                                createMenuItem("Run Test", e -> RunTest(e), ImageResource.ICON_RUN_TEST);
                             }
                             case null, default -> contextMenu.getItems().add(new MenuItem("Non Existing Type"));
                         }
@@ -308,8 +308,8 @@ public class ContextMenuFactory {
     }
 
     private void createInitContextMenu() {
-        createMenuItem("Expand All", e -> expandTreeView(treeTableView.getRoot(), true), "expand.png");
-        createMenuItem("Collapse All", e -> expandTreeView(treeTableView.getRoot(), false), "collapse.png");
+        createMenuItem("Expand All", e -> expandTreeView(treeTableView.getRoot(), true), ImageResource.ICON_EXPAND_ALL);
+        createMenuItem("Collapse All", e -> expandTreeView(treeTableView.getRoot(), false), ImageResource.ICON_COLLAPSE_ALL);
         treeTableView.setContextMenu(contextMenu);
     }
 

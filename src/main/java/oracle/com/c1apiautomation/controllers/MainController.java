@@ -14,6 +14,8 @@ import javafx.scene.control.*;
 
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
@@ -39,12 +41,16 @@ public class MainController {
     public VBox root;
     public Label lblEnv;
     public TextField txtSearch;
+//    public Image imgSaveToJson;
+    public ImageView imgViewSaveToJson;
     Root rootData;
     Environment selectedEnvironment;
     private String rootFolder = "C:\\Users\\VSAFANOV\\Documents\\My Super Deals Private Folder\\Sandbox\\JavaFX";
     private Vars runtimeVars = MainApplication.getVars();
 
     public void initialize() throws IOException {
+        var img = ImageFactory.getImageView(ImageResource.ICON_SAVE).getImage();
+        imgViewSaveToJson.setImage(img);
         handleLoadFromJson();
     }
 
@@ -119,7 +125,7 @@ public class MainController {
         SeparatorMenuItem smi = new SeparatorMenuItem();
         envMenu.add(smi);
 
-        MenuItem config = new MenuItem("Configure", ImageFactory.getImageView("configure1.png"));
+        MenuItem config = new MenuItem("Configure", ImageFactory.getImageView(ImageResource.ICON_CONFIGURE));
         config.setOnAction(this::ConfigureEnvironment);
         envMenu.add(config);
     }

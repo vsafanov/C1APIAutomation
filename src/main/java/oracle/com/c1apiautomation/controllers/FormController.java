@@ -13,6 +13,7 @@ import oracle.com.c1apiautomation.model.*;
 import oracle.com.c1apiautomation.model.Module;
 import oracle.com.c1apiautomation.apifactory.ContentType;
 import oracle.com.c1apiautomation.apifactory.HttpStatus;
+import oracle.com.c1apiautomation.uihelpers.ImageResource;
 import oracle.com.c1apiautomation.utils.Util;
 
 import java.io.IOException;
@@ -94,11 +95,11 @@ public class FormController {
             var authTypes = FXCollections.observableArrayList("", "basic", "jwt");
             cmbAuthType.setItems(authTypes);
 
-            MenuItem mi1 = new MenuItem("Format Json", ImageFactory.getImageView("format.png"));
+            MenuItem mi1 = new MenuItem("Format Json", ImageFactory.getImageView(ImageResource.ICON_FORMAT));
             mi1.setOnAction(e -> Util.formatJson(taPayload.getText()));
             CustomInputContextMenu.addMenuItems(taPayload, mi1);
 
-            MenuItem mi2 = new MenuItem("Format Json", ImageFactory.getImageView("format.png"));
+            MenuItem mi2 = new MenuItem("Format Json", ImageFactory.getImageView(ImageResource.ICON_FORMAT));
             mi2.setOnAction(e -> Util.formatJson(taExpectedRes.getText()));
             CustomInputContextMenu.addMenuItems(taExpectedRes, mi2);
         }
