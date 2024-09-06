@@ -33,7 +33,7 @@ public class ApiExecutionEngine {
         System.out.println("parsedUrl:" + parsedUrl);
 
         //replace placeholder for Token
-        if (baseTestCase.getUseAuthentication().equalsIgnoreCase("bearer")) {
+        if (baseTestCase.getAuthType().equalsIgnoreCase("bearer")) {
             var token = runtimeVars.getByKey("token", true) == null ?
                     globalVars.getByKey("token", true) :
                     runtimeVars.getByKey("token", true);
@@ -42,7 +42,7 @@ public class ApiExecutionEngine {
         }
 
         //replace placeholder for User/Password
-        if (baseTestCase.getUseAuthentication().equalsIgnoreCase("basic")) {
+        if (baseTestCase.getAuthType().equalsIgnoreCase("basic")) {
             var userName = baseTestCase.getUserName();
             var password = baseTestCase.getPassword();
             userName = Util.replaceVarPlaceholder(userName, runtimeVarsProperties);

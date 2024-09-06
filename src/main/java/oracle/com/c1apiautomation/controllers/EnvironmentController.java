@@ -47,6 +47,7 @@ public class EnvironmentController {
     ObservableList<PropertyItem> items;
     private Map<String, String> originalProperties;
     private Environment selectedEnvironment; //variable selected from combobox!
+    private String activeEnvironment; //variable selected from combobox!
     private MainController mainController;
     private final Vars runtimeVars = MainApplication.getVars();
     private Environment runtimeEnvironment = new Environment();
@@ -76,6 +77,7 @@ public class EnvironmentController {
     }
 
     public void initialize() {
+
 
         //init buttons
         createImageButton(btnCopy, ImageResource.ICON_COPY_ENV, "Copy Environment");
@@ -202,11 +204,17 @@ public class EnvironmentController {
         dlg.getDialogPane().getScene().getWindow().setOnCloseRequest(event -> {
             controller.cancelChanges();
         });
+
+
+        if(name != null)
+        {
+            controller.activeEnvironment = name;
+            controller.btnDelete.setDisable(true);
+        }
         controller.environments = environments;
         var env = getEnvironmentByName(name);
         controller.selectedEnvironment = env;
         controller.originalProperties = new HashMap<>(env.getVars().getProperties());
-
         controller.runtimeEnvironment = this.runtimeEnvironment;
         //init cmbEnv with values
         if (environments != null) {
@@ -317,6 +325,12 @@ public class EnvironmentController {
         var name = ((ComboBox<?>) actionEvent.getSource()).getValue();
         if (name == null) name = selectedEnvironment.getName();
         cmbEnv.setValue(name);
+
+        btnDelete.setDisable(false);
+        if(name.equals(activeEnvironment))
+        {
+            btnDelete.setDisable(true);
+        }
 
         loadEnvTable(name.toString());
     }

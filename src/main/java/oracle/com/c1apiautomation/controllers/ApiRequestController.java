@@ -100,7 +100,7 @@ public class ApiRequestController {
         input = testCase.getInput();
         txtToken.setText(testCase.getToken());
         cmbMethod.setValue(testCase.getRequestType());
-        var selectedAuth = switch (testCase.getUseAuthentication().toLowerCase()) {
+        var selectedAuth = switch (testCase.getAuthType().toLowerCase()) {
             case "basic" -> "Basic Auth";
             case "bearer" -> "Bearer Auth";
             default -> "No Auth";

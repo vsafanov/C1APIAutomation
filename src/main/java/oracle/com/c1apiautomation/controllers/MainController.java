@@ -6,21 +6,15 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import javafx.beans.property.*;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.cell.TextFieldTreeTableCell;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.VBox;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.utils.Util;
 import oracle.com.c1apiautomation.uihelpers.*;
@@ -31,7 +25,6 @@ import oracle.com.c1apiautomation.utils.UserPreferences;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 public class MainController {
 
@@ -198,7 +191,7 @@ public class MainController {
         requestTypeColumn.setCellFactory(column -> new RequestTypeTreeTableCell());
 
         var requestServiceUrlColumn = Util.createStringColumn("Service Url", BaseTestCase.class, BaseTestCase::getServiceUrl, 150);
-        var authColumn = Util.createStringColumn("Auth", BaseTestCase.class, BaseTestCase::getUseAuthentication, 50);
+        var authColumn = Util.createStringColumn("Auth", BaseTestCase.class, BaseTestCase::getAuthType, 50);
         var requestRequestParamsColumn = Util.createStringColumn("Payload", BaseTestCase.class, BaseTestCase::getPayload, 150);
         var expectedResponseCodeColumn = Util.createStringColumn("Status Code", BaseTestCase.class, BaseTestCase::getExpectedResponseCode, 75);
         var expectedResponseColumn = Util.createStringColumn("Expected Response", BaseTestCase.class, BaseTestCase::getExpectedResponse, 150);

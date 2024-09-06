@@ -44,7 +44,7 @@
                 </rowConstraints>
                 <CheckBox fx:id="chkSelected" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" styleClass="label" text="Run Test" GridPane.rowIndex="13" />
                 <Label text="Test Case Id" />
-                <TextField fx:id="txtId" prefHeight="25.0" prefWidth="161.0" GridPane.columnIndex="1" />
+                <TextField fx:id="txtId" prefHeight="25.0" prefWidth="161.0" onKeyPressed="#onTextFieldKeyPress" GridPane.columnIndex="1" />
                 <Label text="Title" GridPane.rowIndex="1" />
                 <TextField fx:id="txtTitle" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                 <Label text="Request Type" GridPane.rowIndex="3" />
@@ -135,6 +135,6 @@
             </GridPane>
         </AnchorPane>
     </content>
-    <ButtonType fx:constant="OK" />
+    <ButtonType fx:constant="OK" fx:id="btnOk" />
     <ButtonType fx:constant="CANCEL" />
 </DialogPane>
