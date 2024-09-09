@@ -15,10 +15,11 @@ public class TestResponse {
     private Vars runtimeVars;
     private String payload;
     private Boolean skipValidation;
-    private final String executionTime = (new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")).format(new Date());
+    private final String executionTime;
     private String error;
 
     public TestResponse() {
+        executionTime = (new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")).format(new Date());
     }
 
     public String getExecutionTime() {

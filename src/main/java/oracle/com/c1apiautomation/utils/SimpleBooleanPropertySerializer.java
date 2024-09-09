@@ -1,4 +1,4 @@
-package oracle.com.c1apiautomation.model;
+package oracle.com.c1apiautomation.utils;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;

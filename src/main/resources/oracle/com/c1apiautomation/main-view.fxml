@@ -49,7 +49,7 @@
         <Label text="Environment:"  styleClass="label-env-default"/>
       <Label fx:id="lblEnv" text="No Environment"  styleClass="label-env-default" />
     </HBox>
-   <TreeTableView fx:id="ttvContainer" VBox.vgrow="ALWAYS">
+   <TreeTableView fx:id="ttvContainer" VBox.vgrow="ALWAYS" >
 
    </TreeTableView>
 </VBox>

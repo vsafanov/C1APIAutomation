@@ -33,6 +33,8 @@
     -fx-border-radius: 6;
     -fx-border-width: 1;
     -fx-padding: 8;
+    /*-fx-font-family: "JetBrains Mono";*/
+    /*-fx-font-size: 14.0;*/
     /*-fx-background-insets: 0, 1;*/
 }
 

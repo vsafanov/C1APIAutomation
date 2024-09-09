@@ -1,4 +1,4 @@
-package oracle.com.c1apiautomation.model;
+package oracle.com.c1apiautomation.utils;
 
 public class PropertyItem {
     private String name;

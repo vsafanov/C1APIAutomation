@@ -17,10 +17,8 @@ import oracle.com.c1apiautomation.utils.Util;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public class FormController {
@@ -35,7 +33,7 @@ public class FormController {
     public CheckBox chkSelected;
     public TextField txtDescription;
     public TextField txtServiceUrl;
-    public TextField txtContentType;
+    //    public TextField txtContentType;
     public TextField txtPassword;
     public ComboBox<String> cmbRequestType;
     public CheckBox chkSkipValidation;
@@ -60,6 +58,8 @@ public class FormController {
     public TextField txtRelease;
     public TextField txtToken;
     public ButtonType btnOk;
+    public TextField txtHeaders;
+    public ComboBox cmbContentType;
 
 
     //    private EditMode editMode;
@@ -75,14 +75,15 @@ public class FormController {
     public void initialize() {
         if (cmbRequestType != null) {
 
-
 //            var requestTypes = FXCollections.observableArrayList("POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS");
 //            cmbRequestType.setItems(requestTypes);
 
             Util.loadCmbMethod(cmbRequestType);
 
-            var x = Arrays.stream(ContentType.getAllValues()).map(ContentType::getValue).collect(Collectors.joining(","));
-            System.out.println("Content Types:" + x);
+//            var x = Arrays.stream(ContentType.getAllValues()).map(ContentType::getValue).collect(Collectors.joining(","));
+//            System.out.println("Content Types:" + x);
+//            var list = ContentType.getAllValues().stream().map(ContentType::getValue).toList();
+            cmbContentType.setItems(ContentType.getAllNames());
 
 //            var responseCodes = FXCollections.observableArrayList("200", "201", "202", "204", "400", "403", "404", "500", "NA");
 //            var responseCodes = FXCollections.observableHashMap();
@@ -93,11 +94,11 @@ public class FormController {
             }
 
 //            cmdResponseCode.setItems(HttpStatus.getCodes());
-            var authTypes = FXCollections.observableArrayList("", "basic", "jwt");
+            var authTypes = FXCollections.observableArrayList("", "basic", "bearer");
             cmbAuthType.setItems(authTypes);
 
             MenuItem mi1 = new MenuItem("Format Json", ImageFactory.getImageView(ImageResource.ICON_FORMAT));
-            mi1.setOnAction(e -> taPayload.setText( Util.formatJson(taPayload.getText())));
+            mi1.setOnAction(e -> taPayload.setText(Util.formatJson(taPayload.getText())));
             CustomInputContextMenu.addMenuItems(taPayload, mi1);
 
             MenuItem mi2 = new MenuItem("Format Json", ImageFactory.getImageView(ImageResource.ICON_FORMAT));
@@ -119,7 +120,7 @@ public class FormController {
             txtDescription.setText(model.getDescription());
             cmbRequestType.setValue(model.getRequestType());
             txtServiceUrl.setText(model.getServiceUrl());
-            txtContentType.setText(model.getContentType());
+            cmbContentType.setValue(model.getContentType());
 
             var code = model.getExpectedResponseCode() == null ? "" : HttpStatus.getByCode(Integer.parseInt(model.getExpectedResponseCode()));
             cmdResponseCode.setValue(code);
@@ -168,9 +169,9 @@ public class FormController {
         model.setInput(taInput.getText());
         model.setDbQuery(taDbQuery.getText());
         model.setExpectedDBResult(taExpectedDBRes.getText());
-        model.setTearDownSql(taExpectedRes.getText());
+        model.setTearDownSql(taTearDownSql.getText());
         model.setRelease(txtRelease.getText());
-
+        model.setContentType(cmbContentType.getValue().toString());
     }
 
 //    private FXMLLoader OpenDialog(Dialog dlg, String fxmlFile) throws IOException {
@@ -184,20 +185,19 @@ public class FormController {
 //        return fxmlLoader;
 //    }
 
-    private void validateForm(Dialog dlg, FormController controller)
-    {
+    private void validateForm(Dialog dlg, FormController controller) {
         Button okButton = (Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
 
         // Add validation logic to the OK button
         okButton.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
-        String inputText = controller.txtId.getText();
-        if (inputText == null || inputText.trim().isEmpty()) {
-            controller.txtId.setStyle("-fx-border-color: 'red'");
-            event.consume(); // Prevent dialog from closing
-            // Display error message (can also show a validation message inside the dialog)
-            System.out.println("TextField cannot be empty!");
-        }
-    });
+            String inputText = controller.txtId.getText();
+            if (inputText == null || inputText.trim().isEmpty()) {
+                controller.txtId.setStyle("-fx-border-color: 'red'");
+                event.consume(); // Prevent dialog from closing
+                // Display error message (can also show a validation message inside the dialog)
+                System.out.println("TextField cannot be empty!");
+            }
+        });
     }
 
     public void addMicroservice(TreeItem<Object> selectedItem) throws IOException {
@@ -205,7 +205,7 @@ public class FormController {
         var dlg = new Dialog();
         dlg.setTitle("Add Microservice");
 //        var fxmlLoader = OpenDialog(dlg, "msform-view.fxml");
-        var fxmlLoader = Util.OpenDialog(dlg, "msform-view.fxml",scene);
+        var fxmlLoader = Util.OpenDialog(dlg, "msform-view.fxml", scene);
         var controller = (FormController) fxmlLoader.getController();
         dlg.showAndWait();
         if (dlg.getResult() == ButtonType.OK) {
@@ -234,7 +234,7 @@ public class FormController {
         var dlg = new Dialog();
         dlg.setTitle("Add Module");
 //        var fxmlLoader = OpenDialog(dlg, "msform-view.fxml");
-        var fxmlLoader = Util.OpenDialog(dlg, "msform-view.fxml",scene);
+        var fxmlLoader = Util.OpenDialog(dlg, "msform-view.fxml", scene);
         var controller = (FormController) fxmlLoader.getController();
 
         controller.txtMs.setText(microservice.getName());
@@ -271,7 +271,7 @@ public class FormController {
             dlg.setTitle("Edit " + baseTestCase.getId());
         }
 //        var fxmlLoader = OpenDialog(dlg, "form-view.fxml");
-        var fxmlLoader = Util.OpenDialog(dlg, "form-view.fxml",scene);
+        var fxmlLoader = Util.OpenDialog(dlg, "form-view.fxml", scene);
 
         var controller = (FormController) fxmlLoader.getController();
 
@@ -327,8 +327,7 @@ public class FormController {
     }
 
     public void onTextFieldKeyPress(KeyEvent keyEvent) {
-        if(!keyEvent.getText().isEmpty())
-        {
+        if (!keyEvent.getText().isEmpty()) {
             txtId.setStyle("-fx-border-color: ''");
         }
     }

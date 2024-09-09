@@ -150,6 +150,9 @@ public class Util {
             e.printStackTrace();
         }
     }
+
+
+
 //    public static <T> TreeTableColumn<Object, Boolean> createBooleanColumn(String header, Class<T> type, Callback<T, Boolean> propertyGetter) {
 //        TreeTableColumn<Object, Boolean> column = new TreeTableColumn<>(header);
 //        column.setCellFactory(CheckBoxTreeTableCell.forTreeTableColumn(column));

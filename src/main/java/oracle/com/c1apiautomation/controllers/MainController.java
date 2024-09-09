@@ -16,6 +16,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import oracle.com.c1apiautomation.MainApplication;
+import oracle.com.c1apiautomation.utils.JsonConfig;
+import oracle.com.c1apiautomation.utils.OSPlatform;
 import oracle.com.c1apiautomation.utils.Util;
 import oracle.com.c1apiautomation.uihelpers.*;
 import oracle.com.c1apiautomation.model.*;
@@ -262,7 +264,6 @@ public class MainController {
             rootItem.getChildren().add(microserviceItem);
         }
 
-//        ttvContainer.setRoot(rootItem);
         ttvContainer.setEditable(true);
 
         //add context menu
@@ -271,8 +272,6 @@ public class MainController {
         ttvContainer.setTableMenuButtonVisible(true);
 
         ttvContainer.setShowRoot(false);
-//        ttvContainer.setShowRoot(true);
-
     }
 
     private void CommitEdit(CellEditEvent<Object, String> event) {
@@ -290,9 +289,11 @@ public class MainController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files", "*.json"));
         fileChooser.setTitle("Select Jason API Test Project");
-        fileChooser.setInitialDirectory(new File(rootFolder));
+        if(OSPlatform.isDesktop())
+        {
+            fileChooser.setInitialDirectory(new File(rootFolder));
+        }
         File file = fileChooser.showOpenDialog(null);
-
         if (file != null) {
             LoadTreeTableView(file.getPath());
             menuBar.getMenus().getLast().getItems().clear();

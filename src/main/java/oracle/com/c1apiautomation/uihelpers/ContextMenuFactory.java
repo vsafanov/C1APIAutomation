@@ -27,33 +27,34 @@ public class ContextMenuFactory {
         this.selectedEnvironment = selectedEnvironment;
 //        this.runtimeVars = runtimeVars;
         contextMenu = new ContextMenu();
+        contextMenu.setStyle("-fx-padding:10");
     }
 
     public void CreateContextMenu() {
 
         treeTableView.setOnContextMenuRequested(event ->
                 {
-                    //TODO: Create class to store all images as constants
-
                     contextMenu.getItems().clear();
                     var selectedItem = ((TreeTableView<?>) event.getSource()).getSelectionModel().getSelectedItem();
                     if (selectedItem != null) {
 
                         switch (selectedItem.getValue()) {
                             case Microservice microservice -> {
-                                createMenuItem("Add New Microservice", e -> EditRecord(e, EditMode.ADD_MICROSERVICE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("New Microservice", e -> EditRecord(e, EditMode.ADD_MICROSERVICE), ImageResource.ICON_ADD_NEW);
                                 createMenuItem("Delete Microservice", e -> DeleteRecord(), ImageResource.ICON_DELETE);
-                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("New Module", e -> EditRecord(e, EditMode.ADD_MODULE), ImageResource.ICON_ADD_NEW);
+                                contextMenu.getItems().add(new SeparatorMenuItem());
                                 createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && (clipboardContent instanceof Microservice || clipboardContent instanceof Module)) {
                                     createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
                                 }
                             }
                             case Module module -> {
-                                createMenuItem("Add New Module", e -> EditRecord(e, EditMode.ADD_MODULE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("New Module", e -> EditRecord(e, EditMode.ADD_MODULE), ImageResource.ICON_ADD_NEW);
                                 createMenuItem("Delete Module", e -> DeleteRecord(), ImageResource.ICON_DELETE);
-                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), ImageResource.ICON_ADD_NEW);
-                                createMenuItem("Add New Test", e -> EditRecord(e, EditMode.ADD_TESTCASE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("New Test", e -> EditRecord(e, EditMode.ADD_TESTCASE), ImageResource.ICON_ADD_NEW);
+                                contextMenu.getItems().add(new SeparatorMenuItem());
                                 createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && (clipboardContent instanceof BaseTestCase || clipboardContent instanceof Module)) {
                                     createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
@@ -61,10 +62,10 @@ public class ContextMenuFactory {
 
                             }
                             case PreReq preReq -> {
-                                createMenuItem("Add New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("New PreReq", e -> EditRecord(e, EditMode.ADD_PREREQ), ImageResource.ICON_ADD_NEW);
                                 createMenuItem("Edit PreReq", e -> EditRecord(e, EditMode.EDIT_PREREQ), ImageResource.ICON_EDIT);
                                 createMenuItem("Delete PreReq", e -> DeleteRecord(), ImageResource.ICON_DELETE);
-
+                                contextMenu.getItems().add(new SeparatorMenuItem());
                                 createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && clipboardContent instanceof PreReq) {
                                     createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
@@ -72,20 +73,22 @@ public class ContextMenuFactory {
                             }
 
                             case TestCase testCase -> {
-                                createMenuItem("Add New Test Case", e -> EditRecord(e, EditMode.ADD_TESTCASE), ImageResource.ICON_ADD_NEW);
+                                createMenuItem("New Test Case", e -> EditRecord(e, EditMode.ADD_TESTCASE), ImageResource.ICON_ADD_NEW);
                                 createMenuItem("Edit Test Case", e -> EditRecord(e, EditMode.EDIT_TESTCASE), ImageResource.ICON_EDIT);
                                 createMenuItem("Delete Test Case", e -> DeleteRecord(), ImageResource.ICON_DELETE);
-
+                                createMenuItem("Run Request", e -> RunRequest(e), ImageResource.ICON_RUN_REQUEST);
+                                createMenuItem("Run Test", e -> RunTest(e), ImageResource.ICON_RUN_TEST);
+                                contextMenu.getItems().add(new SeparatorMenuItem());
                                 createMenuItem("Copy", e -> CopyRecord(), ImageResource.ICON_COPY);
                                 if (clipboardContent != null && clipboardContent instanceof TestCase) {
                                     createMenuItem("Paste", e -> PasteRecord(), ImageResource.ICON_PASTE);
                                 }
-                                createMenuItem("Run Request", e -> RunRequest(e), ImageResource.ICON_RUN_REQUEST);
-                                createMenuItem("Run Test", e -> RunTest(e), ImageResource.ICON_RUN_TEST);
+
                             }
                             case null, default -> contextMenu.getItems().add(new MenuItem("Non Existing Type"));
                         }
                         System.out.println(selectedItem.getValue());
+                        contextMenu.getItems().add(new SeparatorMenuItem());
                     }
                     createInitContextMenu();
                 }
@@ -209,7 +212,6 @@ public class ContextMenuFactory {
             System.out.println(clipboardContent);
         }
     }
-
 
     private void PasteRecord() {
         var selectedItem = (TreeItem<Object>) treeTableView.getSelectionModel().getSelectedItem();
@@ -342,7 +344,6 @@ public class ContextMenuFactory {
             }
         }
     }
-
 
     private void DeleteRecord() {
         // create an alert

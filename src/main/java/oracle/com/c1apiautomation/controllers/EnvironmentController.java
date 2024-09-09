@@ -15,7 +15,7 @@ import javafx.util.Callback;
 import javafx.util.converter.DefaultStringConverter;
 import oracle.com.c1apiautomation.MainApplication;
 import oracle.com.c1apiautomation.model.Environment;
-import oracle.com.c1apiautomation.model.PropertyItem;
+import oracle.com.c1apiautomation.utils.PropertyItem;
 import oracle.com.c1apiautomation.model.Vars;
 import oracle.com.c1apiautomation.uihelpers.ImageFactory;
 import oracle.com.c1apiautomation.uihelpers.ImageResource;

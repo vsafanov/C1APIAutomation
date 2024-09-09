@@ -70,8 +70,8 @@ public class ApiRequestController {
         if (cmbContentType != null) {
 //            var text = new Pair<>(ContentType.TEXT_PLAIN.getName(), ContentType.TEXT_PLAIN.getValue());
 
-            cmbContentType.getItems().addAll(ContentType.TEXT_PLAIN.getValue(), ContentType.APPLICATION_JSON.getValue(), ContentType.APPLICATION_XML.getValue());
-
+//            cmbContentType.getItems().addAll(ContentType.TEXT_PLAIN.getValue(), ContentType.APPLICATION_JSON.getValue(), ContentType.APPLICATION_XML.getValue());
+            cmbContentType.setItems(ContentType.getAllNames());
             //create colored combo box for cmbMethod
             Util.loadCmbMethod(cmbMethod);
 

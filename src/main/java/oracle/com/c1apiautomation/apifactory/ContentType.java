@@ -1,5 +1,10 @@
 package oracle.com.c1apiautomation.apifactory;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.util.Arrays;
+
 public enum ContentType {
     TEXT_PLAIN("text/plain"),
     TEXT_HTML("text/html"),
@@ -43,8 +48,17 @@ public enum ContentType {
 
     }
 
+
     public static ContentType[] getAllValues() {
         return ContentType.values();
+    }
+
+    public static ObservableList<String> getAllNames() {
+        return FXCollections.observableArrayList(
+                Arrays.stream(ContentType.values())
+                        .map(ContentType::getValue)
+                        .toList()
+        );
     }
 
     public String getValue() {

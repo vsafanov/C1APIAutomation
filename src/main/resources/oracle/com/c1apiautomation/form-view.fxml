@@ -22,54 +22,56 @@
                     <ColumnConstraints hgrow="SOMETIMES" maxWidth="284.0" minWidth="10.0" prefWidth="259.0" />
                 </columnConstraints>
                 <rowConstraints>
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="26.0" minHeight="10.0" prefHeight="11.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="59.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="54.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               <RowConstraints maxHeight="55.0" minHeight="3.0" prefHeight="15.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="55.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               <RowConstraints maxHeight="45.0" minHeight="10.0" prefHeight="11.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="87.0" minHeight="10.0" prefHeight="31.0" vgrow="SOMETIMES" />
-               <RowConstraints maxHeight="55.0" minHeight="5.0" prefHeight="5.0" vgrow="SOMETIMES" />
-                    <RowConstraints maxHeight="122.0" minHeight="10.0" prefHeight="118.0" vgrow="SOMETIMES" />
+               <RowConstraints maxHeight="24.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+               <RowConstraints maxHeight="24.0" minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="12.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="6.600012207031227" prefHeight="10.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="33.0" vgrow="SOMETIMES" />
+                    <RowConstraints minHeight="10.0" prefHeight="77.4000122070313" vgrow="SOMETIMES" />
                 </rowConstraints>
-                <CheckBox fx:id="chkSelected" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" styleClass="label" text="Run Test" GridPane.rowIndex="13" />
-                <Label text="Test Case Id" />
-                <TextField fx:id="txtId" prefHeight="25.0" prefWidth="161.0" onKeyPressed="#onTextFieldKeyPress" GridPane.columnIndex="1" />
-                <Label text="Title" GridPane.rowIndex="1" />
-                <TextField fx:id="txtTitle" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <Label text="Request Type" GridPane.rowIndex="3" />
-                <Label text="Description" GridPane.rowIndex="2" />
-                <TextField fx:id="txtDescription" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                <Label text="Service Url" GridPane.rowIndex="4" />
-                <TextField fx:id="txtServiceUrl" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                <TextField fx:id="txtContentType" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                <TextField fx:id="txtPassword" GridPane.columnIndex="1" GridPane.rowIndex="10" />
-                <Label text="Content Type" GridPane.rowIndex="5" />
-                <Label text="Expected Response Code" GridPane.rowIndex="6" />
-                <Label text="Password" GridPane.rowIndex="10" />
-                <ComboBox fx:id="cmbRequestType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                <CheckBox fx:id="chkSkipValidation" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" styleClass="label" text="Skip Validation" GridPane.rowIndex="14" />
-                <ComboBox fx:id="cmdResponseCode" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                <Label text="User Name" GridPane.rowIndex="9" />
-                <TextField fx:id="txtUserName" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                <CheckBox fx:id="chkSelected" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" styleClass="label" text="Run Test" />
+                <Label text="Test Case Id" GridPane.rowIndex="3" />
+                <TextField fx:id="txtId" onKeyPressed="#onTextFieldKeyPress" prefHeight="25.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                <Label text="Title" GridPane.rowIndex="4" />
+                <TextField fx:id="txtTitle" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label text="Request Type" GridPane.rowIndex="6" />
+                <Label text="Description" GridPane.rowIndex="5" />
+                <TextField fx:id="txtDescription" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                <Label text="Service Url" GridPane.rowIndex="7" />
+                <TextField fx:id="txtServiceUrl" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                <TextField fx:id="txtPassword" GridPane.columnIndex="1" GridPane.rowIndex="14" />
+                <Label text="Content Type" GridPane.rowIndex="9" />
+                <Label text="Expected Response Code" GridPane.rowIndex="10" />
+                <Label text="Password" GridPane.rowIndex="14" />
+                <ComboBox fx:id="cmbRequestType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                <CheckBox fx:id="chkSkipValidation" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT" styleClass="label" text="Skip Validation" GridPane.rowIndex="1" />
+                <ComboBox fx:id="cmdResponseCode" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                <Label text="User Name" GridPane.rowIndex="13" />
+                <TextField fx:id="txtUserName" prefHeight="26.0" prefWidth="161.0" GridPane.columnIndex="1" GridPane.rowIndex="13" />
                 <Label text="PreReq Sql" GridPane.rowIndex="18" />
                 <TextArea fx:id="taPreReqSql" prefHeight="117.0" prefWidth="259.0" GridPane.columnIndex="1" GridPane.rowIndex="18" />
-                <Label text="Authentication Type" GridPane.rowIndex="8" />
-                <ComboBox fx:id="cmbAuthType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-            <Label text="Release" GridPane.rowIndex="16" />
-            <TextField fx:id="txtRelease" GridPane.columnIndex="1" GridPane.rowIndex="16" />
-            <Label text="Token" GridPane.rowIndex="11" />
-            <TextField fx:id="txtToken" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                <Label text="Authentication Type" GridPane.rowIndex="12" />
+                <ComboBox fx:id="cmbAuthType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+            <Label text="Release" GridPane.rowIndex="17" />
+            <TextField fx:id="txtRelease" GridPane.columnIndex="1" GridPane.rowIndex="17" />
+            <Label text="Token" GridPane.rowIndex="15" />
+            <TextField fx:id="txtToken" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+            <Label text="Headers" GridPane.rowIndex="8" />
+            <TextField fx:id="txtHeaders" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+            <ComboBox fx:id="cmbContentType" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
             </GridPane>
             <GridPane layoutX="471.0" layoutY="29.0" prefHeight="571.0" prefWidth="606.0" AnchorPane.topAnchor="19.0">
                 <columnConstraints>
@@ -135,6 +137,6 @@
             </GridPane>
         </AnchorPane>
     </content>
-    <ButtonType fx:constant="OK" fx:id="btnOk" />
+    <ButtonType fx:id="btnOk" fx:constant="OK" />
     <ButtonType fx:constant="CANCEL" />
 </DialogPane>

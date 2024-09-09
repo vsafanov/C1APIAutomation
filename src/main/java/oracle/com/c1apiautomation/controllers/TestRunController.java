@@ -76,7 +76,7 @@ public class TestRunController {
             try {
                 var json = mapper.writeValueAsString(testResponse);
                 TextArea area = new TextArea(json);
-                area.setStyle(testResponse.getTestPassed()?"-fx-text-fill: green":"-fx-text-fill: red");
+                area.setStyle("-fx-text-fill:" + (testResponse.getTestPassed()? "green":"red"));
 
                 area.setWrapText(true);
                 area.setEditable(false);
